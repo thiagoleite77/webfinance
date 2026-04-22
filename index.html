@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Gestão Financeira</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -11,6 +11,18 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <div class="name-modal" id="nameModal" aria-hidden="true">
+    <div class="name-modal-card">
+      <h2>Bem-vindo</h2>
+      <p>Antes de começar, informe seu nome para personalizar sua gestão financeira.</p>
+      <form id="nameForm" class="modal-form">
+        <label for="userNameInput">Seu nome</label>
+        <input id="userNameInput" type="text" maxlength="30" placeholder="Ex.: Thiago" required>
+        <button type="submit" class="btn-primary btn-block">Entrar</button>
+      </form>
+    </div>
+  </div>
+
   <div class="app-shell">
     <aside class="sidebar">
       <div class="brand-card">
@@ -37,15 +49,98 @@
         <header class="page-header">
           <div>
             <h2>Controle Financeiro</h2>
-            <p>Cadastre receitas e despesas, acompanhe categorias e visualize seus maiores gastos.</p>
+            <p>Visualize seus valores primeiro, filtre por período e depois adicione novos registros.</p>
           </div>
         </header>
 
-        <section class="card form-card">
+        <section class="toolbar card compact-card">
+          <div class="period-head">
+            <div>
+              <h3>Filtro automático por período</h3>
+              <p>Os dados abaixo mudam automaticamente conforme o período selecionado.</p>
+            </div>
+          </div>
+          <div class="period-buttons" id="periodButtons">
+            <button class="period-btn active" data-period="day" type="button">Hoje</button>
+            <button class="period-btn" data-period="week" type="button">Semana</button>
+            <button class="period-btn" data-period="month" type="button">Mês</button>
+            <button class="period-btn" data-period="all" type="button">Tudo</button>
+          </div>
+          <div class="period-range" id="periodRangeLabel"></div>
+        </section>
+
+        <section class="stats-grid">
+          <article class="card stat-card highlight-card">
+            <span>Saldo disponível</span>
+            <strong id="balanceValue">R$ 0,00</strong>
+            <small>Receitas - despesas - investimentos</small>
+          </article>
+          <article class="card stat-card income-card">
+            <span>Receitas</span>
+            <strong id="incomeValue">R$ 0,00</strong>
+            <small>Total de entradas no período</small>
+          </article>
+          <article class="card stat-card expense-card">
+            <span>Despesas</span>
+            <strong id="expenseValue">R$ 0,00</strong>
+            <small>Total de saídas no período</small>
+          </article>
+          <article class="card stat-card investment-card">
+            <span>Investimentos</span>
+            <strong id="investmentValue">R$ 0,00</strong>
+            <small>Total investido no período</small>
+          </article>
+        </section>
+
+        <section class="charts-grid">
+          <article class="card chart-card">
+            <div class="card-header">
+              <div>
+                <h3>Saídas por categoria</h3>
+                <p>Despesas e investimentos agrupados por categoria.</p>
+              </div>
+            </div>
+            <div class="chart-wrapper"><canvas id="categoryChart"></canvas></div>
+          </article>
+
+          <article class="card chart-card">
+            <div class="card-header">
+              <div>
+                <h3>Movimentação no período</h3>
+                <p>Comparação entre receitas, despesas e investimentos.</p>
+              </div>
+            </div>
+            <div class="chart-wrapper"><canvas id="monthlyChart"></canvas></div>
+          </article>
+        </section>
+
+        <section class="content-grid">
+          <article class="card">
+            <div class="card-header">
+              <div>
+                <h3>Maiores saídas</h3>
+                <p>Veja o que mais consome seu dinheiro no período filtrado.</p>
+              </div>
+            </div>
+            <div id="topCategories" class="list-stack empty-state-inline">Nenhuma saída cadastrada no período.</div>
+          </article>
+
+          <article class="card">
+            <div class="card-header">
+              <div>
+                <h3>Registros do período</h3>
+                <p>Edite ou exclua um lançamento individualmente.</p>
+              </div>
+            </div>
+            <div id="entriesList" class="list-stack empty-state-inline">Nenhum registro cadastrado.</div>
+          </article>
+        </section>
+
+        <section class="card form-card add-record-card">
           <div class="card-header">
             <div>
-              <h3>Novo registro</h3>
-              <p>Cadastre um lançamento financeiro.</p>
+              <h3>Adicionar registro</h3>
+              <p>Cadastre receitas, despesas e investimentos.</p>
             </div>
           </div>
 
@@ -62,7 +157,7 @@
 
             <div class="field field-span-2">
               <label for="entryDescription">Descrição</label>
-              <input id="entryDescription" type="text" maxlength="80" placeholder="Ex.: Almoço, salário, farmácia" required />
+              <input id="entryDescription" type="text" maxlength="80" placeholder="Ex.: Almoço, salário, aporte Tesouro" required />
             </div>
 
             <div class="field">
@@ -94,88 +189,13 @@
             </div>
           </form>
         </section>
-
-        <section class="stats-grid">
-          <article class="card stat-card">
-            <span>Saldo atual</span>
-            <strong id="balanceValue">R$ 0,00</strong>
-          </article>
-          <article class="card stat-card">
-            <span>Receitas</span>
-            <strong id="incomeValue">R$ 0,00</strong>
-          </article>
-          <article class="card stat-card">
-            <span>Despesas</span>
-            <strong id="expenseValue">R$ 0,00</strong>
-          </article>
-          <article class="card stat-card">
-            <span>Taxa de economia</span>
-            <strong id="savingsRateValue">0%</strong>
-          </article>
-        </section>
-
-        <section class="charts-grid">
-          <article class="card chart-card">
-            <div class="card-header">
-              <div>
-                <h3>Gastos por categoria</h3>
-                <p>Veja onde o seu dinheiro está sendo mais consumido.</p>
-              </div>
-            </div>
-            <div class="chart-wrapper"><canvas id="categoryChart"></canvas></div>
-          </article>
-
-          <article class="card chart-card">
-            <div class="card-header">
-              <div>
-                <h3>Fluxo por mês</h3>
-                <p>Comparação entre receitas e despesas mensais.</p>
-              </div>
-            </div>
-            <div class="chart-wrapper"><canvas id="monthlyChart"></canvas></div>
-          </article>
-        </section>
-
-        <section class="charts-grid single-grid">
-          <article class="card chart-card">
-            <div class="card-header">
-              <div>
-                <h3>Gastos por forma de pagamento</h3>
-                <p>Distribuição das despesas por método de pagamento.</p>
-              </div>
-            </div>
-            <div class="chart-wrapper"><canvas id="paymentChart"></canvas></div>
-          </article>
-        </section>
-
-        <section class="content-grid">
-          <article class="card">
-            <div class="card-header">
-              <div>
-                <h3>Maiores categorias de despesa</h3>
-                <p>Ranking com os principais destinos do seu dinheiro.</p>
-              </div>
-            </div>
-            <div id="topCategories" class="list-stack empty-state-inline">Nenhuma despesa cadastrada até o momento.</div>
-          </article>
-
-          <article class="card">
-            <div class="card-header">
-              <div>
-                <h3>Registros</h3>
-                <p>Edite ou exclua um lançamento individualmente.</p>
-              </div>
-            </div>
-            <div id="entriesList" class="list-stack empty-state-inline">Nenhum registro cadastrado.</div>
-          </article>
-        </section>
       </section>
 
       <section id="orcamentosSection" class="page-section">
         <header class="page-header compact-header">
           <div>
             <h2>Orçamentos</h2>
-            <p>Defina limites mensais para categorias de despesa e acompanhe seu uso.</p>
+            <p>Defina limites mensais para categorias de despesa e acompanhe o uso.</p>
           </div>
         </header>
 
@@ -184,7 +204,7 @@
             <div class="card-header">
               <div>
                 <h3>Orçamento por categoria</h3>
-                <p>Defina um limite mensal para categorias de despesa.</p>
+                <p>Crie limites para suas despesas mensais.</p>
               </div>
             </div>
             <form id="budgetForm" class="form-grid two-columns">
@@ -206,7 +226,7 @@
             <div class="card-header">
               <div>
                 <h3>Desempenho dos orçamentos</h3>
-                <p>Compare o gasto atual com o limite definido.</p>
+                <p>Compare o gasto do mês atual com o limite definido.</p>
               </div>
             </div>
             <div id="budgetsList" class="list-stack empty-state-inline">Nenhum orçamento definido.</div>
@@ -218,7 +238,7 @@
         <header class="page-header compact-header">
           <div>
             <h2>Categorias</h2>
-            <p>Cadastre categorias personalizadas para receitas e despesas.</p>
+            <p>Cadastre categorias personalizadas para despesas, receitas e investimentos.</p>
           </div>
         </header>
 
@@ -227,7 +247,7 @@
             <div class="card-header">
               <div>
                 <h3>Nova categoria</h3>
-                <p>Organize melhor seus lançamentos.</p>
+                <p>Organize seus lançamentos do seu jeito.</p>
               </div>
             </div>
             <form id="categoryForm" class="form-grid two-columns">
@@ -236,11 +256,12 @@
                 <select id="categoryType" required>
                   <option value="expense">Despesa</option>
                   <option value="income">Receita</option>
+                  <option value="investment">Investimento</option>
                 </select>
               </div>
               <div class="field">
                 <label for="categoryName">Nome da categoria</label>
-                <input id="categoryName" type="text" maxlength="40" placeholder="Ex.: Freelance, Academia" required />
+                <input id="categoryName" type="text" maxlength="40" placeholder="Ex.: Freelance, Tesouro Selic" required>
               </div>
               <div class="form-actions field-span-2">
                 <button type="submit" class="btn-primary">Adicionar categoria</button>
@@ -251,648 +272,679 @@
           <article class="card">
             <div class="card-header">
               <div>
-                <h3>Categorias cadastradas</h3>
-                <p>As categorias padrão não podem ser removidas.</p>
+                <h3>Lista de categorias</h3>
+                <p>Exclua apenas categorias personalizadas que não estiverem em uso.</p>
               </div>
             </div>
-            <div id="categoriesList" class="list-stack"></div>
+            <div id="categoriesList" class="list-stack empty-state-inline">Nenhuma categoria cadastrada.</div>
           </article>
         </section>
       </section>
     </main>
   </div>
 
-  <div class="modal-backdrop hidden" id="nameModal">
-    <div class="modal-card">
-      <h2>Bem-vindo</h2>
-      <p>Antes de começar, informe seu nome para personalizar sua experiência.</p>
-      <form id="nameForm" class="modal-form">
-        <div class="field">
-          <label for="userNameInput">Seu nome</label>
-          <input id="userNameInput" type="text" maxlength="40" placeholder="Digite seu nome" required />
-        </div>
-        <button type="submit" class="btn-primary full-width">Continuar</button>
-      </form>
-    </div>
-  </div>
+<script>
+(() => {
+  const STORAGE_KEYS = {
+    userName: 'gf_user_name',
+    entries: 'gf_entries_v4',
+    budgets: 'gf_budgets_v4',
+    categories: 'gf_categories_v4',
+    period: 'gf_period_v1'
+  };
 
-  <script>
-    const STORAGE_KEYS = {
-      userName: 'gf_user_name_v1',
-      entries: 'gf_entries_v1',
-      categories: 'gf_categories_v1',
-      budgets: 'gf_budgets_v1'
-    };
+  const TYPE_META = {
+    income: { label: 'Receita', prefix: 'Receita', className: 'income' },
+    expense: { label: 'Despesa', prefix: 'Despesa', className: 'expense' },
+    investment: { label: 'Investimento', prefix: 'Investimento', className: 'investment' }
+  };
 
-    const DEFAULT_CATEGORIES = [
-      { id: crypto.randomUUID(), name: 'Salário', type: 'income', default: true },
-      { id: crypto.randomUUID(), name: 'Freelance', type: 'income', default: true },
-      { id: crypto.randomUUID(), name: 'Vendas', type: 'income', default: true },
-      { id: crypto.randomUUID(), name: 'Investimentos', type: 'income', default: true },
-      { id: crypto.randomUUID(), name: 'Outras receitas', type: 'income', default: true },
-      { id: crypto.randomUUID(), name: 'Comida', type: 'expense', default: true },
-      { id: crypto.randomUUID(), name: 'Farmácia', type: 'expense', default: true },
-      { id: crypto.randomUUID(), name: 'Mercado', type: 'expense', default: true },
-      { id: crypto.randomUUID(), name: 'Transporte', type: 'expense', default: true },
-      { id: crypto.randomUUID(), name: 'Moradia', type: 'expense', default: true },
-      { id: crypto.randomUUID(), name: 'Lazer', type: 'expense', default: true },
-      { id: crypto.randomUUID(), name: 'Educação', type: 'expense', default: true },
-      { id: crypto.randomUUID(), name: 'Saúde', type: 'expense', default: true },
-      { id: crypto.randomUUID(), name: 'Contas', type: 'expense', default: true },
-      { id: crypto.randomUUID(), name: 'Assinaturas', type: 'expense', default: true },
-      { id: crypto.randomUUID(), name: 'Outros gastos', type: 'expense', default: true }
-    ];
+  const defaultCategories = [
+    { id: 'exp-food', name: 'Comida', type: 'expense', locked: true },
+    { id: 'exp-pharmacy', name: 'Farmácia', type: 'expense', locked: true },
+    { id: 'exp-market', name: 'Mercado', type: 'expense', locked: true },
+    { id: 'exp-transport', name: 'Transporte', type: 'expense', locked: true },
+    { id: 'exp-housing', name: 'Moradia', type: 'expense', locked: true },
+    { id: 'exp-leisure', name: 'Lazer', type: 'expense', locked: true },
+    { id: 'exp-education', name: 'Educação', type: 'expense', locked: true },
+    { id: 'exp-health', name: 'Saúde', type: 'expense', locked: true },
+    { id: 'exp-bills', name: 'Contas', type: 'expense', locked: true },
+    { id: 'exp-subscriptions', name: 'Assinaturas', type: 'expense', locked: true },
+    { id: 'exp-other', name: 'Outros gastos', type: 'expense', locked: true },
+    { id: 'inc-salary', name: 'Salário', type: 'income', locked: true },
+    { id: 'inc-bonus', name: 'Bônus', type: 'income', locked: true },
+    { id: 'inc-freelance', name: 'Freelance', type: 'income', locked: true },
+    { id: 'inc-sales', name: 'Vendas', type: 'income', locked: true },
+    { id: 'inc-other', name: 'Outras receitas', type: 'income', locked: true },
+    { id: 'inv-cdb', name: 'CDB', type: 'investment', locked: true },
+    { id: 'inv-tesouro', name: 'Tesouro Direto', type: 'investment', locked: true },
+    { id: 'inv-acoes', name: 'Ações', type: 'investment', locked: true },
+    { id: 'inv-fii', name: 'Fundos Imobiliários', type: 'investment', locked: true },
+    { id: 'inv-cripto', name: 'Cripto', type: 'investment', locked: true },
+    { id: 'inv-reserva', name: 'Reserva', type: 'investment', locked: true }
+  ];
 
-    const state = {
-      userName: '',
-      entries: loadFromStorage(STORAGE_KEYS.entries, []),
-      categories: loadFromStorage(STORAGE_KEYS.categories, DEFAULT_CATEGORIES),
-      budgets: loadFromStorage(STORAGE_KEYS.budgets, {}),
-      editingEntryId: null,
-      charts: {}
-    };
+  const currency = (value) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(value || 0));
+  const formatDate = (value) => new Intl.DateTimeFormat('pt-BR', { timeZone: 'UTC' }).format(new Date(value + 'T00:00:00'));
+  const todayStr = () => new Date().toISOString().split('T')[0];
+  const normalizeText = (value) => value.trim().replace(/\s+/g, ' ');
 
-    const entryForm = document.getElementById('entryForm');
-    const entryType = document.getElementById('entryType');
-    const entryCategory = document.getElementById('entryCategory');
-    const entryDescription = document.getElementById('entryDescription');
-    const entryAmount = document.getElementById('entryAmount');
-    const entryDate = document.getElementById('entryDate');
-    const entryPayment = document.getElementById('entryPayment');
-    const saveButton = document.getElementById('saveButton');
-    const cancelEditButton = document.getElementById('cancelEditButton');
+  let entries = load(STORAGE_KEYS.entries, []);
+  let budgets = load(STORAGE_KEYS.budgets, {});
+  let categories = ensureDefaultCategories(load(STORAGE_KEYS.categories, defaultCategories));
+  let selectedPeriod = load(STORAGE_KEYS.period, 'month');
+  let editingId = null;
+  let categoryChart = null;
+  let monthlyChart = null;
 
-    const balanceValue = document.getElementById('balanceValue');
-    const incomeValue = document.getElementById('incomeValue');
-    const expenseValue = document.getElementById('expenseValue');
-    const savingsRateValue = document.getElementById('savingsRateValue');
+  const els = {
+    nameModal: document.getElementById('nameModal'),
+    nameForm: document.getElementById('nameForm'),
+    userNameInput: document.getElementById('userNameInput'),
+    brandIcon: document.getElementById('brandIcon'),
+    userGreeting: document.getElementById('userGreeting'),
+    periodButtons: document.getElementById('periodButtons'),
+    periodRangeLabel: document.getElementById('periodRangeLabel'),
+    balanceValue: document.getElementById('balanceValue'),
+    incomeValue: document.getElementById('incomeValue'),
+    expenseValue: document.getElementById('expenseValue'),
+    investmentValue: document.getElementById('investmentValue'),
+    topCategories: document.getElementById('topCategories'),
+    entriesList: document.getElementById('entriesList'),
+    entryForm: document.getElementById('entryForm'),
+    entryType: document.getElementById('entryType'),
+    entryCategory: document.getElementById('entryCategory'),
+    entryDescription: document.getElementById('entryDescription'),
+    entryAmount: document.getElementById('entryAmount'),
+    entryDate: document.getElementById('entryDate'),
+    entryPayment: document.getElementById('entryPayment'),
+    saveButton: document.getElementById('saveButton'),
+    cancelEditButton: document.getElementById('cancelEditButton'),
+    budgetForm: document.getElementById('budgetForm'),
+    budgetCategory: document.getElementById('budgetCategory'),
+    budgetAmount: document.getElementById('budgetAmount'),
+    budgetsList: document.getElementById('budgetsList'),
+    categoryForm: document.getElementById('categoryForm'),
+    categoryType: document.getElementById('categoryType'),
+    categoryName: document.getElementById('categoryName'),
+    categoriesList: document.getElementById('categoriesList')
+  };
 
-    const topCategories = document.getElementById('topCategories');
-    const entriesList = document.getElementById('entriesList');
+  function load(key, fallback) {
+    try {
+      const raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : fallback;
+    } catch {
+      return fallback;
+    }
+  }
 
-    const budgetForm = document.getElementById('budgetForm');
-    const budgetCategory = document.getElementById('budgetCategory');
-    const budgetAmount = document.getElementById('budgetAmount');
-    const budgetsList = document.getElementById('budgetsList');
+  function save(key, value) {
+    localStorage.setItem(key, JSON.stringify(value));
+  }
 
-    const categoryForm = document.getElementById('categoryForm');
-    const categoryType = document.getElementById('categoryType');
-    const categoryName = document.getElementById('categoryName');
-    const categoriesList = document.getElementById('categoriesList');
+  function ensureDefaultCategories(current) {
+    const map = new Map(current.map(item => [item.id, item]));
+    defaultCategories.forEach(item => {
+      if (!map.has(item.id)) map.set(item.id, item);
+    });
+    return Array.from(map.values());
+  }
 
-    const brandIcon = document.getElementById('brandIcon');
-    const userGreeting = document.getElementById('userGreeting');
-    const nameModal = document.getElementById('nameModal');
-    const nameForm = document.getElementById('nameForm');
-    const userNameInput = document.getElementById('userNameInput');
+  function getUserName() {
+    return localStorage.getItem(STORAGE_KEYS.userName) || '';
+  }
 
-    document.getElementById('entryDate').value = new Date().toISOString().split('T')[0];
+  function setUserName(name) {
+    localStorage.setItem(STORAGE_KEYS.userName, name);
+    renderUser();
+  }
 
-    init();
+  function renderUser() {
+    const name = getUserName();
+    const firstLetter = name ? name.charAt(0).toUpperCase() : 'G';
+    els.brandIcon.textContent = firstLetter;
+    els.userGreeting.textContent = name ? `Olá, ${name}` : 'Olá';
+  }
 
-    function init() {
-      state.userName = localStorage.getItem(STORAGE_KEYS.userName) || '';
-      bindNavigation();
-      bindForms();
-      setupTypeOptions();
-      updateUserUI();
-      if (!state.userName.trim()) {
-        nameModal.classList.remove('hidden');
-      }
-      renderAll();
+  function checkUserName() {
+    const name = getUserName();
+    if (!name) {
+      els.nameModal.classList.add('open');
+      els.userNameInput.focus();
+    }
+    renderUser();
+  }
+
+  function fillTypeOptions() {
+    els.entryType.innerHTML = Object.entries(TYPE_META)
+      .map(([value, meta]) => `<option value="${value}">${meta.label}</option>`)
+      .join('');
+  }
+
+  function getCategoriesByType(type) {
+    return categories
+      .filter(category => category.type === type)
+      .sort((a, b) => a.name.localeCompare(b.name, 'pt-BR'));
+  }
+
+  function categoryLabel(entry) {
+    const typeLabel = TYPE_META[entry.type]?.prefix || 'Registro';
+    return `${typeLabel} (${entry.categoryName})`;
+  }
+
+  function fillCategoryOptions(type) {
+    const options = getCategoriesByType(type);
+    els.entryCategory.innerHTML = options
+      .map(category => `<option value="${category.id}">${category.name}</option>`)
+      .join('');
+  }
+
+  function fillBudgetCategories() {
+    const options = getCategoriesByType('expense');
+    els.budgetCategory.innerHTML = options
+      .map(category => `<option value="${category.id}">${category.name}</option>`)
+      .join('');
+  }
+
+  function getCategoryById(id) {
+    return categories.find(category => category.id === id);
+  }
+
+  function getDateRange(period) {
+    const now = new Date();
+    const current = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    let start = null;
+    let end = new Date(current);
+    end.setDate(end.getDate() + 1);
+
+    if (period === 'day') {
+      start = current;
+    } else if (period === 'week') {
+      start = new Date(current);
+      const day = start.getDay();
+      const diff = day === 0 ? 6 : day - 1;
+      start.setDate(start.getDate() - diff);
+      end = new Date(start);
+      end.setDate(end.getDate() + 7);
+    } else if (period === 'month') {
+      start = new Date(current.getFullYear(), current.getMonth(), 1);
+      end = new Date(current.getFullYear(), current.getMonth() + 1, 1);
     }
 
-    function bindNavigation() {
-      const navButtons = document.querySelectorAll('.nav-link');
-      navButtons.forEach(button => {
-        button.addEventListener('click', () => {
-          navButtons.forEach(btn => btn.classList.remove('active'));
-          button.classList.add('active');
-          document.querySelectorAll('.page-section').forEach(section => section.classList.remove('active'));
-          document.getElementById(button.dataset.section).classList.add('active');
-        });
+    return { start, end };
+  }
+
+  function isEntryInSelectedPeriod(entry) {
+    if (selectedPeriod === 'all') return true;
+    const { start, end } = getDateRange(selectedPeriod);
+    const entryDate = new Date(entry.date + 'T00:00:00');
+    return entryDate >= start && entryDate < end;
+  }
+
+  function getFilteredEntries() {
+    return [...entries]
+      .filter(isEntryInSelectedPeriod)
+      .sort((a, b) => new Date(b.date) - new Date(a.date));
+  }
+
+  function renderPeriodHeader() {
+    const labels = { day: 'Hoje', week: 'Esta semana', month: 'Este mês', all: 'Todo o histórico' };
+    const range = getDateRange(selectedPeriod);
+    let text = labels[selectedPeriod];
+    if (selectedPeriod !== 'all') {
+      const start = new Intl.DateTimeFormat('pt-BR').format(range.start);
+      const endDate = new Date(range.end);
+      endDate.setDate(endDate.getDate() - 1);
+      const end = new Intl.DateTimeFormat('pt-BR').format(endDate);
+      text += ` · ${start} até ${end}`;
+    }
+    els.periodRangeLabel.textContent = text;
+
+    document.querySelectorAll('.period-btn').forEach(button => {
+      button.classList.toggle('active', button.dataset.period === selectedPeriod);
+    });
+  }
+
+  function renderSummary(filteredEntries) {
+    const income = filteredEntries.filter(item => item.type === 'income').reduce((sum, item) => sum + item.amount, 0);
+    const expense = filteredEntries.filter(item => item.type === 'expense').reduce((sum, item) => sum + item.amount, 0);
+    const investment = filteredEntries.filter(item => item.type === 'investment').reduce((sum, item) => sum + item.amount, 0);
+    const balance = income - expense - investment;
+
+    els.balanceValue.textContent = currency(balance);
+    els.incomeValue.textContent = currency(income);
+    els.expenseValue.textContent = currency(expense);
+    els.investmentValue.textContent = currency(investment);
+  }
+
+  function renderTopCategories(filteredEntries) {
+    const grouped = {};
+    filteredEntries
+      .filter(item => item.type === 'expense' || item.type === 'investment')
+      .forEach(item => {
+        const key = `${item.type}:${item.categoryName}`;
+        grouped[key] = (grouped[key] || 0) + item.amount;
       });
+
+    const ranking = Object.entries(grouped)
+      .map(([key, total]) => {
+        const [type, category] = key.split(':');
+        return { type, category, total };
+      })
+      .sort((a, b) => b.total - a.total)
+      .slice(0, 6);
+
+    if (!ranking.length) {
+      els.topCategories.innerHTML = '<div class="empty-state-inline">Nenhuma saída cadastrada no período.</div>';
+      return;
     }
 
-    function bindForms() {
-      entryForm.addEventListener('submit', handleEntrySubmit);
-      entryType.addEventListener('change', () => {
-        populateCategorySelect(entryType.value, entryCategory, true);
-      });
-      cancelEditButton.addEventListener('click', resetEntryForm);
-
-      budgetForm.addEventListener('submit', handleBudgetSubmit);
-      categoryForm.addEventListener('submit', handleCategorySubmit);
-      nameForm.addEventListener('submit', handleNameSubmit);
-    }
-
-    function handleNameSubmit(event) {
-      event.preventDefault();
-      const name = userNameInput.value.trim();
-      if (!name) return;
-      state.userName = name;
-      localStorage.setItem(STORAGE_KEYS.userName, name);
-      updateUserUI();
-      nameModal.classList.add('hidden');
-    }
-
-    function updateUserUI() {
-      const name = state.userName?.trim();
-      if (name) {
-        userGreeting.textContent = `Olá, ${name}`;
-        brandIcon.textContent = name.charAt(0).toUpperCase();
-      } else {
-        userGreeting.textContent = 'Olá';
-        brandIcon.textContent = 'G';
-      }
-    }
-
-    function setupTypeOptions() {
-      entryType.innerHTML = `
-        <option value="income">Receita</option>
-        <option value="expense">Despesa</option>
-      `;
-      populateCategorySelect(entryType.value, entryCategory, true);
-      populateBudgetCategories();
-    }
-
-    function handleEntrySubmit(event) {
-      event.preventDefault();
-
-      const categoryId = entryCategory.value;
-      const category = state.categories.find(item => item.id === categoryId);
-
-      const payload = {
-        id: state.editingEntryId || crypto.randomUUID(),
-        type: entryType.value,
-        categoryId,
-        categoryName: category?.name || 'Sem categoria',
-        description: entryDescription.value.trim(),
-        amount: Number(entryAmount.value),
-        date: entryDate.value,
-        paymentMethod: entryPayment.value,
-        createdAt: new Date().toISOString()
-      };
-
-      if (!payload.description || !payload.date || !payload.amount || !categoryId) return;
-
-      if (state.editingEntryId) {
-        const index = state.entries.findIndex(entry => entry.id === state.editingEntryId);
-        state.entries[index] = payload;
-      } else {
-        state.entries.unshift(payload);
-      }
-
-      saveEntries();
-      resetEntryForm();
-      renderAll();
-    }
-
-    function handleBudgetSubmit(event) {
-      event.preventDefault();
-      const categoryId = budgetCategory.value;
-      const amount = Number(budgetAmount.value);
-      if (!categoryId || !amount) return;
-      state.budgets[categoryId] = amount;
-      saveBudgets();
-      budgetForm.reset();
-      populateBudgetCategories();
-      renderBudgets();
-    }
-
-    function handleCategorySubmit(event) {
-      event.preventDefault();
-      const name = categoryName.value.trim();
-      const type = categoryType.value;
-
-      if (!name) return;
-
-      const exists = state.categories.some(category => category.name.toLowerCase() === name.toLowerCase() && category.type === type);
-      if (exists) {
-        alert('Essa categoria já existe para esse tipo.');
-        return;
-      }
-
-      state.categories.push({
-        id: crypto.randomUUID(),
-        name,
-        type,
-        default: false
-      });
-
-      saveCategories();
-      categoryForm.reset();
-      renderAll();
-    }
-
-    function renderAll() {
-      populateCategorySelect(entryType.value, entryCategory, false);
-      populateBudgetCategories();
-      renderSummary();
-      renderEntries();
-      renderTopCategories();
-      renderBudgets();
-      renderCategories();
-      renderCharts();
-    }
-
-    function renderSummary() {
-      const income = state.entries.filter(entry => entry.type === 'income').reduce((sum, entry) => sum + entry.amount, 0);
-      const expense = state.entries.filter(entry => entry.type === 'expense').reduce((sum, entry) => sum + entry.amount, 0);
-      const balance = income - expense;
-      const savingsRate = income > 0 ? ((balance / income) * 100) : 0;
-
-      balanceValue.textContent = formatCurrency(balance);
-      incomeValue.textContent = formatCurrency(income);
-      expenseValue.textContent = formatCurrency(expense);
-      savingsRateValue.textContent = `${savingsRate.toFixed(1)}%`;
-    }
-
-    function renderEntries() {
-      if (!state.entries.length) {
-        entriesList.className = 'list-stack empty-state-inline';
-        entriesList.textContent = 'Nenhum registro cadastrado.';
-        return;
-      }
-
-      entriesList.className = 'list-stack';
-      entriesList.innerHTML = state.entries
-        .sort((a, b) => new Date(b.date) - new Date(a.date))
-        .map(entry => {
-          const typeLabel = entry.type === 'expense' ? 'Despesa' : 'Receita';
-          const badgeClass = entry.type === 'expense' ? 'expense' : 'income';
-          return `
-            <div class="list-item">
-              <div class="list-main">
-                <div class="list-topline">
-                  <strong>${escapeHtml(entry.description)}</strong>
-                  <span class="badge ${badgeClass}">${typeLabel} (${escapeHtml(entry.categoryName)})</span>
-                </div>
-                <div class="list-meta">
-                  <span>${formatDate(entry.date)}</span>
-                  <span>${escapeHtml(entry.paymentMethod)}</span>
-                </div>
-              </div>
-              <div class="list-side">
-                <strong>${formatCurrency(entry.amount)}</strong>
-                <div class="item-actions">
-                  <button class="btn-link" onclick="editEntry('${entry.id}')">Editar</button>
-                  <button class="btn-link danger" onclick="deleteEntry('${entry.id}')">Excluir</button>
-                </div>
-              </div>
-            </div>
-          `;
-        })
-        .join('');
-    }
-
-    function renderTopCategories() {
-      const expenseTotals = {};
-      state.entries
-        .filter(entry => entry.type === 'expense')
-        .forEach(entry => {
-          expenseTotals[entry.categoryName] = (expenseTotals[entry.categoryName] || 0) + entry.amount;
-        });
-
-      const ordered = Object.entries(expenseTotals).sort((a, b) => b[1] - a[1]).slice(0, 6);
-
-      if (!ordered.length) {
-        topCategories.className = 'list-stack empty-state-inline';
-        topCategories.textContent = 'Nenhuma despesa cadastrada até o momento.';
-        return;
-      }
-
-      topCategories.className = 'list-stack';
-      topCategories.innerHTML = ordered.map(([name, total], index) => `
-        <div class="list-item compact">
-          <div class="list-main">
-            <strong>${index + 1}. ${escapeHtml(name)}</strong>
-            <div class="progress-line"><span style="width:${Math.min((total / ordered[0][1]) * 100, 100)}%"></span></div>
-          </div>
-          <div class="list-side"><strong>${formatCurrency(total)}</strong></div>
+    els.topCategories.innerHTML = ranking.map((item, index) => `
+      <div class="list-item rank-item">
+        <div>
+          <strong>${index + 1}. ${item.category}</strong>
+          <p>${TYPE_META[item.type].label}</p>
         </div>
-      `).join('');
+        <span>${currency(item.total)}</span>
+      </div>
+    `).join('');
+  }
+
+  function renderEntries(filteredEntries) {
+    if (!filteredEntries.length) {
+      els.entriesList.innerHTML = '<div class="empty-state-inline">Nenhum registro cadastrado.</div>';
+      return;
     }
 
-    function renderBudgets() {
-      const budgetEntries = Object.entries(state.budgets);
-
-      if (!budgetEntries.length) {
-        budgetsList.className = 'list-stack empty-state-inline';
-        budgetsList.textContent = 'Nenhum orçamento definido.';
-        return;
-      }
-
-      budgetsList.className = 'list-stack';
-      budgetsList.innerHTML = budgetEntries.map(([categoryId, budget]) => {
-        const category = state.categories.find(item => item.id === categoryId);
-        if (!category) return '';
-        const spent = state.entries
-          .filter(entry => entry.type === 'expense' && entry.categoryId === categoryId)
-          .reduce((sum, entry) => sum + entry.amount, 0);
-        const percent = budget > 0 ? Math.min((spent / budget) * 100, 100) : 0;
-        const barClass = percent >= 100 ? 'danger-bar' : percent >= 75 ? 'warning-bar' : '';
-
-        return `
-          <div class="budget-item">
-            <div class="budget-header">
-              <strong>${escapeHtml(category.name)}</strong>
-              <div class="budget-actions">
-                <span>${formatCurrency(spent)} de ${formatCurrency(budget)}</span>
-                <button class="btn-link danger" onclick="removeBudget('${categoryId}')">Remover</button>
-              </div>
-            </div>
-            <div class="progress-track ${barClass}">
-              <span style="width:${percent}%"></span>
-            </div>
-            <small>${percent.toFixed(1)}% utilizado</small>
+    els.entriesList.innerHTML = filteredEntries.map(entry => `
+      <div class="list-item entry-item ${TYPE_META[entry.type].className}">
+        <div class="entry-main">
+          <div class="entry-top">
+            <strong>${entry.description}</strong>
+            <span class="entry-value">${currency(entry.amount)}</span>
           </div>
-        `;
-      }).join('');
-    }
-
-    function renderCategories() {
-      const incomeCategories = state.categories.filter(category => category.type === 'income');
-      const expenseCategories = state.categories.filter(category => category.type === 'expense');
-
-      categoriesList.innerHTML = `
-        <div class="category-group">
-          <h4>Receitas</h4>
-          <div class="list-stack">
-            ${incomeCategories.map(renderCategoryItem).join('')}
-          </div>
+          <p>${categoryLabel(entry)} · ${entry.payment} · ${formatDate(entry.date)}</p>
         </div>
-        <div class="category-group">
-          <h4>Despesas</h4>
-          <div class="list-stack">
-            ${expenseCategories.map(renderCategoryItem).join('')}
-          </div>
+        <div class="entry-actions">
+          <button class="btn-small btn-edit" data-action="edit" data-id="${entry.id}">Editar</button>
+          <button class="btn-small btn-remove" data-action="remove" data-id="${entry.id}">Excluir</button>
         </div>
-      `;
+      </div>
+    `).join('');
+  }
+
+  function getMonthExpensesForCategory(categoryId) {
+    const now = new Date();
+    return entries
+      .filter(item => item.type === 'expense' && item.categoryId === categoryId)
+      .filter(item => {
+        const d = new Date(item.date + 'T00:00:00');
+        return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
+      })
+      .reduce((sum, item) => sum + item.amount, 0);
+  }
+
+  function renderBudgets() {
+    const items = Object.entries(budgets)
+      .map(([categoryId, amount]) => {
+        const category = getCategoryById(categoryId);
+        if (!category) return null;
+        const spent = getMonthExpensesForCategory(categoryId);
+        const percentage = amount > 0 ? Math.min((spent / amount) * 100, 100) : 0;
+        return { categoryId, categoryName: category.name, amount, spent, percentage };
+      })
+      .filter(Boolean)
+      .sort((a, b) => a.categoryName.localeCompare(b.categoryName, 'pt-BR'));
+
+    if (!items.length) {
+      els.budgetsList.innerHTML = '<div class="empty-state-inline">Nenhum orçamento definido.</div>';
+      return;
     }
 
-    function renderCategoryItem(category) {
+    els.budgetsList.innerHTML = items.map(item => `
+      <div class="budget-card-item">
+        <div class="budget-top">
+          <div>
+            <strong>${item.categoryName}</strong>
+            <p>${currency(item.spent)} de ${currency(item.amount)}</p>
+          </div>
+          <button class="btn-small btn-remove" data-budget-remove="${item.categoryId}">Remover</button>
+        </div>
+        <div class="progress-bar"><span style="width:${item.percentage}%"></span></div>
+        <small>${item.percentage.toFixed(1)}% utilizado</small>
+      </div>
+    `).join('');
+  }
+
+  function renderCategories() {
+    if (!categories.length) {
+      els.categoriesList.innerHTML = '<div class="empty-state-inline">Nenhuma categoria cadastrada.</div>';
+      return;
+    }
+
+    const sorted = [...categories].sort((a, b) => {
+      if (a.type !== b.type) return a.type.localeCompare(b.type);
+      return a.name.localeCompare(b.name, 'pt-BR');
+    });
+
+    els.categoriesList.innerHTML = sorted.map(category => {
+      const inUse = entries.some(entry => entry.categoryId === category.id);
       return `
-        <div class="list-item compact">
-          <div class="list-main">
-            <strong>${escapeHtml(category.name)}</strong>
-            <span class="badge ${category.type === 'expense' ? 'expense' : 'income'}">${category.type === 'expense' ? 'Despesa' : 'Receita'}</span>
+        <div class="list-item">
+          <div>
+            <strong>${TYPE_META[category.type].label} (${category.name})</strong>
+            <p>${category.locked ? 'Categoria padrão' : 'Categoria personalizada'}</p>
           </div>
-          <div class="list-side">
-            ${category.default ? '<span class="muted-text">Padrão</span>' : `<button class="btn-link danger" onclick="deleteCategory('${category.id}')">Excluir</button>`}
-          </div>
+          ${category.locked || inUse ? '<span class="tag-muted">Protegida</span>' : `<button class="btn-small btn-remove" data-category-remove="${category.id}">Excluir</button>`}
         </div>
       `;
-    }
+    }).join('');
+  }
 
-    function renderCharts() {
-      renderCategoryChart();
-      renderMonthlyChart();
-      renderPaymentChart();
-    }
-
-    function renderCategoryChart() {
-      const expenseTotals = {};
-      state.entries.filter(entry => entry.type === 'expense').forEach(entry => {
-        expenseTotals[entry.categoryName] = (expenseTotals[entry.categoryName] || 0) + entry.amount;
+  function buildCategoryChart(filteredEntries) {
+    const data = {};
+    filteredEntries
+      .filter(item => item.type === 'expense' || item.type === 'investment')
+      .forEach(item => {
+        data[item.categoryName] = (data[item.categoryName] || 0) + item.amount;
       });
 
-      const labels = Object.keys(expenseTotals);
-      const data = Object.values(expenseTotals);
-      const ctx = document.getElementById('categoryChart');
+    const labels = Object.keys(data);
+    const values = Object.values(data);
+    const ctx = document.getElementById('categoryChart');
+    if (categoryChart) categoryChart.destroy();
 
-      resetChart('category');
-      state.charts.category = new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-          labels: labels.length ? labels : ['Sem dados'],
-          datasets: [{
-            data: data.length ? data : [1],
-            backgroundColor: ['#4f8cff', '#7c5cff', '#14b8a6', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#22c55e'],
-            borderColor: '#0f172a',
-            borderWidth: 2
-          }]
+    categoryChart = new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: labels.length ? labels : ['Sem dados'],
+        datasets: [{
+          data: values.length ? values : [1],
+          backgroundColor: labels.length
+            ? ['#4f8cff', '#22c55e', '#f59e0b', '#8b5cf6', '#ef4444', '#06b6d4', '#14b8a6', '#f97316']
+            : ['rgba(148,163,184,0.25)'],
+          borderWidth: 0
+        }]
+      },
+      options: chartBaseOptions({ legendPosition: 'bottom' })
+    });
+  }
+
+  function buildFlowChart(filteredEntries) {
+    const labels = [];
+    const incomeData = [];
+    const expenseData = [];
+    const investmentData = [];
+
+    if (selectedPeriod === 'day') {
+      labels.push('Hoje');
+      incomeData.push(totalByType(filteredEntries, 'income'));
+      expenseData.push(totalByType(filteredEntries, 'expense'));
+      investmentData.push(totalByType(filteredEntries, 'investment'));
+    } else if (selectedPeriod === 'week') {
+      const range = getDateRange('week');
+      for (let i = 0; i < 7; i++) {
+        const d = new Date(range.start);
+        d.setDate(d.getDate() + i);
+        const key = d.toISOString().split('T')[0];
+        labels.push(new Intl.DateTimeFormat('pt-BR', { weekday: 'short' }).format(d));
+        const dayEntries = filteredEntries.filter(item => item.date === key);
+        incomeData.push(totalByType(dayEntries, 'income'));
+        expenseData.push(totalByType(dayEntries, 'expense'));
+        investmentData.push(totalByType(dayEntries, 'investment'));
+      }
+    } else if (selectedPeriod === 'month') {
+      const range = getDateRange('month');
+      const totalDays = new Date(range.end.getFullYear(), range.end.getMonth(), 0).getDate();
+      for (let day = 1; day <= totalDays; day++) {
+        const key = new Date(range.start.getFullYear(), range.start.getMonth(), day).toISOString().split('T')[0];
+        labels.push(String(day));
+        const dayEntries = filteredEntries.filter(item => item.date === key);
+        incomeData.push(totalByType(dayEntries, 'income'));
+        expenseData.push(totalByType(dayEntries, 'expense'));
+        investmentData.push(totalByType(dayEntries, 'investment'));
+      }
+    } else {
+      const grouped = {};
+      filteredEntries.forEach(item => {
+        const d = new Date(item.date + 'T00:00:00');
+        const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+        if (!grouped[key]) grouped[key] = { income: 0, expense: 0, investment: 0 };
+        grouped[key][item.type] += item.amount;
+      });
+      Object.keys(grouped).sort().forEach(key => {
+        const [year, month] = key.split('-');
+        const labelDate = new Date(Number(year), Number(month) - 1, 1);
+        labels.push(new Intl.DateTimeFormat('pt-BR', { month: 'short', year: '2-digit' }).format(labelDate));
+        incomeData.push(grouped[key].income);
+        expenseData.push(grouped[key].expense);
+        investmentData.push(grouped[key].investment);
+      });
+      if (!labels.length) {
+        labels.push('Sem dados');
+        incomeData.push(0); expenseData.push(0); investmentData.push(0);
+      }
+    }
+
+    const ctx = document.getElementById('monthlyChart');
+    if (monthlyChart) monthlyChart.destroy();
+    monthlyChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [
+          { label: 'Receitas', data: incomeData, backgroundColor: '#22c55e', borderRadius: 8 },
+          { label: 'Despesas', data: expenseData, backgroundColor: '#ef4444', borderRadius: 8 },
+          { label: 'Investimentos', data: investmentData, backgroundColor: '#f59e0b', borderRadius: 8 }
+        ]
+      },
+      options: chartBaseOptions({ legendPosition: 'bottom', stacked: false })
+    });
+  }
+
+  function chartBaseOptions({ legendPosition = 'top', stacked = false } = {}) {
+    return {
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: legendPosition,
+          labels: { color: '#dbe8ff', boxWidth: 12, usePointStyle: true }
+        }
+      },
+      scales: {
+        x: {
+          stacked,
+          ticks: { color: '#b8cae6' },
+          grid: { color: 'rgba(148,163,184,0.08)' }
         },
-        options: chartOptions('Distribuição de despesas')
-      });
-    }
-
-    function renderMonthlyChart() {
-      const monthsMap = {};
-      state.entries.forEach(entry => {
-        const month = entry.date.slice(0, 7);
-        if (!monthsMap[month]) monthsMap[month] = { income: 0, expense: 0 };
-        monthsMap[month][entry.type] += entry.amount;
-      });
-
-      const labels = Object.keys(monthsMap).sort();
-      const incomeData = labels.map(label => monthsMap[label].income);
-      const expenseData = labels.map(label => monthsMap[label].expense);
-      const ctx = document.getElementById('monthlyChart');
-
-      resetChart('monthly');
-      state.charts.monthly = new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: labels.length ? labels.map(formatMonthLabel) : ['Sem dados'],
-          datasets: [
-            {
-              label: 'Receitas',
-              data: incomeData.length ? incomeData : [0],
-              backgroundColor: '#22c55e'
-            },
-            {
-              label: 'Despesas',
-              data: expenseData.length ? expenseData : [0],
-              backgroundColor: '#ef4444'
-            }
-          ]
-        },
-        options: chartOptions('Fluxo mensal', true)
-      });
-    }
-
-    function renderPaymentChart() {
-      const paymentTotals = {};
-      state.entries.filter(entry => entry.type === 'expense').forEach(entry => {
-        paymentTotals[entry.paymentMethod] = (paymentTotals[entry.paymentMethod] || 0) + entry.amount;
-      });
-
-      const labels = Object.keys(paymentTotals);
-      const data = Object.values(paymentTotals);
-      const ctx = document.getElementById('paymentChart');
-
-      resetChart('payment');
-      state.charts.payment = new Chart(ctx, {
-        type: 'pie',
-        data: {
-          labels: labels.length ? labels : ['Sem dados'],
-          datasets: [{
-            data: data.length ? data : [1],
-            backgroundColor: ['#38bdf8', '#a78bfa', '#34d399', '#fbbf24', '#f87171', '#60a5fa', '#fb7185'],
-            borderColor: '#0f172a',
-            borderWidth: 2
-          }]
-        },
-        options: chartOptions('Pagamentos')
-      });
-    }
-
-    function chartOptions(title, showYAxis = false) {
-      return {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            labels: { color: '#dbe6ff' }
+        y: {
+          stacked,
+          beginAtZero: true,
+          ticks: {
+            color: '#b8cae6',
+            callback: (value) => currency(value)
           },
-          tooltip: {
-            callbacks: {
-              label: context => `${context.label}: ${formatCurrency(context.parsed || context.raw)}`
-            }
-          }
-        },
-        scales: showYAxis ? {
-          x: {
-            ticks: { color: '#c7d2fe' },
-            grid: { color: 'rgba(148, 163, 184, 0.14)' }
-          },
-          y: {
-            beginAtZero: true,
-            ticks: {
-              color: '#c7d2fe',
-              callback: value => formatCurrency(value)
-            },
-            grid: { color: 'rgba(148, 163, 184, 0.14)' }
-          }
-        } : {}
-      };
-    }
-
-    function populateCategorySelect(type, selectElement, keepSelection) {
-      const currentValue = keepSelection ? '' : selectElement.value;
-      const filtered = state.categories.filter(category => category.type === type);
-      selectElement.innerHTML = filtered.map(category => `
-        <option value="${category.id}">${type === 'expense' ? 'Despesa' : 'Receita'} (${escapeHtml(category.name)})</option>
-      `).join('');
-
-      if (!keepSelection && filtered.some(item => item.id === currentValue)) {
-        selectElement.value = currentValue;
+          grid: { color: 'rgba(148,163,184,0.08)' }
+        }
       }
+    };
+  }
+
+  function totalByType(items, type) {
+    return items.filter(item => item.type === type).reduce((sum, item) => sum + item.amount, 0);
+  }
+
+  function refreshAll() {
+    save(STORAGE_KEYS.entries, entries);
+    save(STORAGE_KEYS.budgets, budgets);
+    save(STORAGE_KEYS.categories, categories);
+    save(STORAGE_KEYS.period, selectedPeriod);
+
+    fillCategoryOptions(els.entryType.value || 'expense');
+    fillBudgetCategories();
+    renderPeriodHeader();
+    const filteredEntries = getFilteredEntries();
+    renderSummary(filteredEntries);
+    renderTopCategories(filteredEntries);
+    renderEntries(filteredEntries);
+    renderBudgets();
+    renderCategories();
+    buildCategoryChart(filteredEntries);
+    buildFlowChart(filteredEntries);
+  }
+
+  function resetEntryForm() {
+    editingId = null;
+    els.entryForm.reset();
+    els.entryDate.value = todayStr();
+    els.entryType.value = 'expense';
+    fillCategoryOptions('expense');
+    els.saveButton.textContent = 'Salvar registro';
+    els.cancelEditButton.classList.add('hidden');
+  }
+
+  function startEditEntry(id) {
+    const entry = entries.find(item => item.id === id);
+    if (!entry) return;
+    editingId = id;
+    els.entryType.value = entry.type;
+    fillCategoryOptions(entry.type);
+    els.entryCategory.value = entry.categoryId;
+    els.entryDescription.value = entry.description;
+    els.entryAmount.value = entry.amount;
+    els.entryDate.value = entry.date;
+    els.entryPayment.value = entry.payment;
+    els.saveButton.textContent = 'Salvar alterações';
+    els.cancelEditButton.classList.remove('hidden');
+    document.querySelector('[data-section="dashboardSection"]').click();
+    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+  }
+
+  document.querySelectorAll('.nav-link').forEach(button => {
+    button.addEventListener('click', () => {
+      document.querySelectorAll('.nav-link').forEach(item => item.classList.remove('active'));
+      button.classList.add('active');
+      document.querySelectorAll('.page-section').forEach(section => section.classList.remove('active'));
+      document.getElementById(button.dataset.section).classList.add('active');
+    });
+  });
+
+  els.nameForm.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const name = normalizeText(els.userNameInput.value);
+    if (!name) return;
+    setUserName(name);
+    els.nameModal.classList.remove('open');
+  });
+
+  els.periodButtons.addEventListener('click', (event) => {
+    const button = event.target.closest('.period-btn');
+    if (!button) return;
+    selectedPeriod = button.dataset.period;
+    refreshAll();
+  });
+
+  els.entryType.addEventListener('change', () => fillCategoryOptions(els.entryType.value));
+
+  els.entryForm.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const type = els.entryType.value;
+    const category = getCategoryById(els.entryCategory.value);
+    if (!category) return;
+
+    const payload = {
+      id: editingId || crypto.randomUUID(),
+      type,
+      categoryId: category.id,
+      categoryName: category.name,
+      description: normalizeText(els.entryDescription.value),
+      amount: Number(els.entryAmount.value),
+      date: els.entryDate.value,
+      payment: els.entryPayment.value
+    };
+
+    if (editingId) {
+      entries = entries.map(item => item.id === editingId ? payload : item);
+    } else {
+      entries.push(payload);
     }
 
-    function populateBudgetCategories() {
-      const filtered = state.categories.filter(category => category.type === 'expense');
-      budgetCategory.innerHTML = filtered.map(category => `
-        <option value="${category.id}">${category.name}</option>
-      `).join('');
+    resetEntryForm();
+    refreshAll();
+  });
+
+  els.cancelEditButton.addEventListener('click', resetEntryForm);
+
+  els.entriesList.addEventListener('click', (event) => {
+    const editButton = event.target.closest('[data-action="edit"]');
+    const removeButton = event.target.closest('[data-action="remove"]');
+
+    if (editButton) {
+      startEditEntry(editButton.dataset.id);
+      return;
     }
 
-    function editEntry(id) {
-      const entry = state.entries.find(item => item.id === id);
-      if (!entry) return;
-      state.editingEntryId = id;
-      entryType.value = entry.type;
-      populateCategorySelect(entry.type, entryCategory, true);
-      entryCategory.value = entry.categoryId;
-      entryDescription.value = entry.description;
-      entryAmount.value = entry.amount;
-      entryDate.value = entry.date;
-      entryPayment.value = entry.paymentMethod;
-      saveButton.textContent = 'Atualizar registro';
-      cancelEditButton.classList.remove('hidden');
-      document.getElementById('dashboardSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (removeButton) {
+      const id = removeButton.dataset.id;
+      entries = entries.filter(item => item.id !== id);
+      if (editingId === id) resetEntryForm();
+      refreshAll();
+    }
+  });
+
+  els.budgetForm.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const amount = Number(els.budgetAmount.value);
+    budgets[els.budgetCategory.value] = amount;
+    els.budgetForm.reset();
+    fillBudgetCategories();
+    refreshAll();
+  });
+
+  els.budgetsList.addEventListener('click', (event) => {
+    const button = event.target.closest('[data-budget-remove]');
+    if (!button) return;
+    delete budgets[button.dataset.budgetRemove];
+    refreshAll();
+  });
+
+  els.categoryForm.addEventListener('submit', (event) => {
+    event.preventDefault();
+    const name = normalizeText(els.categoryName.value);
+    const type = els.categoryType.value;
+
+    const exists = categories.some(category => category.type === type && category.name.toLowerCase() === name.toLowerCase());
+    if (exists) {
+      alert('Essa categoria já existe para esse tipo.');
+      return;
     }
 
-    function resetEntryForm() {
-      state.editingEntryId = null;
-      entryForm.reset();
-      entryType.value = 'income';
-      entryDate.value = new Date().toISOString().split('T')[0];
-      populateCategorySelect(entryType.value, entryCategory, true);
-      saveButton.textContent = 'Salvar registro';
-      cancelEditButton.classList.add('hidden');
-    }
+    categories.push({
+      id: `${type}-${crypto.randomUUID()}`,
+      name,
+      type,
+      locked: false
+    });
 
-    function deleteEntry(id) {
-      state.entries = state.entries.filter(entry => entry.id !== id);
-      saveEntries();
-      renderAll();
-    }
+    els.categoryForm.reset();
+    refreshAll();
+  });
 
-    function deleteCategory(id) {
-      const inUse = state.entries.some(entry => entry.categoryId === id) || Object.prototype.hasOwnProperty.call(state.budgets, id);
-      if (inUse) {
-        alert('Essa categoria está em uso por registros ou orçamentos e não pode ser excluída.');
-        return;
-      }
-      state.categories = state.categories.filter(category => category.id !== id);
-      saveCategories();
-      renderAll();
-    }
+  els.categoriesList.addEventListener('click', (event) => {
+    const button = event.target.closest('[data-category-remove]');
+    if (!button) return;
+    const categoryId = button.dataset.categoryRemove;
+    categories = categories.filter(category => category.id !== categoryId);
+    if (budgets[categoryId]) delete budgets[categoryId];
+    refreshAll();
+  });
 
-    function removeBudget(categoryId) {
-      delete state.budgets[categoryId];
-      saveBudgets();
-      renderBudgets();
-    }
-
-    function saveEntries() {
-      localStorage.setItem(STORAGE_KEYS.entries, JSON.stringify(state.entries));
-    }
-
-    function saveCategories() {
-      localStorage.setItem(STORAGE_KEYS.categories, JSON.stringify(state.categories));
-    }
-
-    function saveBudgets() {
-      localStorage.setItem(STORAGE_KEYS.budgets, JSON.stringify(state.budgets));
-    }
-
-    function resetChart(key) {
-      if (state.charts[key]) {
-        state.charts[key].destroy();
-      }
-    }
-
-    function loadFromStorage(key, fallback) {
-      try {
-        const rawValue = localStorage.getItem(key);
-        return rawValue ? JSON.parse(rawValue) : fallback;
-      } catch {
-        return fallback;
-      }
-    }
-
-    function formatCurrency(value) {
-      return new Intl.NumberFormat('pt-BR', {
-        style: 'currency',
-        currency: 'BRL'
-      }).format(value || 0);
-    }
-
-    function formatDate(value) {
-      return new Intl.DateTimeFormat('pt-BR').format(new Date(value + 'T00:00:00'));
-    }
-
-    function formatMonthLabel(value) {
-      const [year, month] = value.split('-');
-      return `${month}/${year}`;
-    }
-
-    function escapeHtml(text) {
-      return String(text)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
-    }
-
-    window.editEntry = editEntry;
-    window.deleteEntry = deleteEntry;
-    window.deleteCategory = deleteCategory;
-    window.removeBudget = removeBudget;
-  </script>
+  fillTypeOptions();
+  checkUserName();
+  resetEntryForm();
+  refreshAll();
+})();
+</script>
 </body>
 </html>
