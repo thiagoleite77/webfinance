@@ -34,9 +34,10 @@
       </div>
 
       <nav class="sidebar-nav">
-        <button class="nav-link active" data-section="dashboardSection">Dashboard</button>
-        <button class="nav-link" data-section="orcamentosSection">Orçamentos</button>
-        <button class="nav-link" data-section="categoriasSection">Categorias</button>
+        <button class="nav-link active" data-section="dashboardSection" type="button">Dashboard</button>
+        <button class="nav-link" data-section="fixosSection" type="button">Fixos mensais</button>
+        <button class="nav-link" data-section="orcamentosSection" type="button">Orçamentos</button>
+        <button class="nav-link" data-section="categoriasSection" type="button">Categorias</button>
       </nav>
 
       <div class="sidebar-footer">Seus dados ficam salvos localmente no navegador.</div>
@@ -47,7 +48,7 @@
         <header class="page-header">
           <div>
             <h2>Controle Financeiro</h2>
-            <p>Visualize os valores primeiro, acompanhe o extrato e depois adicione novos registros.</p>
+            <p>Veja seus valores primeiro, acompanhe o extrato e depois adicione registros manuais.</p>
           </div>
         </header>
 
@@ -55,7 +56,7 @@
           <div class="period-head">
             <div>
               <h3>Filtro automático por período</h3>
-              <p>Todos os cartões, gráficos, extrato e listas mudam conforme o período selecionado.</p>
+              <p>Cartões, gráficos e extrato mudam automaticamente conforme o período selecionado.</p>
             </div>
           </div>
           <div class="period-buttons" id="periodButtons">
@@ -76,7 +77,7 @@
           <article class="card stat-card income-card">
             <span>Receitas</span>
             <strong id="incomeValue">R$ 0,00</strong>
-            <small>Entradas do período</small>
+            <small>Ganhos do período</small>
           </article>
           <article class="card stat-card expense-card">
             <span>Despesas</span>
@@ -95,7 +96,7 @@
             <div class="card-header">
               <div>
                 <h3>Saídas por categoria</h3>
-                <p>Pizza com despesas e investimentos agrupados por categoria.</p>
+                <p>Despesas e investimentos agrupados por categoria.</p>
               </div>
             </div>
             <div class="chart-wrapper"><canvas id="categoryChart"></canvas></div>
@@ -127,7 +128,7 @@
             <div class="card-header">
               <div>
                 <h3>Extrato</h3>
-                <p>Lista cronológica com todas as movimentações do período.</p>
+                <p>Movimentações manuais e fixas do período.</p>
               </div>
             </div>
             <div id="statementList" class="list-stack empty-state-inline">Nenhum registro cadastrado.</div>
@@ -137,8 +138,8 @@
         <section class="card form-card add-record-card">
           <div class="card-header">
             <div>
-              <h3>Adicionar registro</h3>
-              <p>Cadastre receitas, despesas e investimentos.</p>
+              <h3>Adicionar registro manual</h3>
+              <p>Cadastre receitas, despesas e investimentos fora dos lançamentos fixos mensais.</p>
             </div>
           </div>
 
@@ -186,6 +187,91 @@
               <button type="button" class="btn-secondary hidden" id="cancelEditButton">Cancelar edição</button>
             </div>
           </form>
+        </section>
+      </section>
+
+      <section id="fixosSection" class="page-section">
+        <header class="page-header compact-header">
+          <div>
+            <h2>Fixos mensais</h2>
+            <p>Cadastre valores que se repetem todo mês, como salário, aluguel, mercado, aporte ou assinatura.</p>
+          </div>
+        </header>
+
+        <section class="content-grid">
+          <article class="card form-card">
+            <div class="card-header">
+              <div>
+                <h3>Novo lançamento fixo</h3>
+                <p>O sistema gera automaticamente os registros todo mês a partir da data inicial.</p>
+              </div>
+            </div>
+            <form id="fixedForm" class="form-grid">
+              <div class="field">
+                <label for="fixedType">Tipo</label>
+                <select id="fixedType" required></select>
+              </div>
+
+              <div class="field">
+                <label for="fixedCategory">Categoria</label>
+                <select id="fixedCategory" required></select>
+              </div>
+
+              <div class="field field-span-2">
+                <label for="fixedDescription">Descrição</label>
+                <input id="fixedDescription" type="text" maxlength="80" placeholder="Ex.: Salário empresa, aluguel, aporte mensal" required>
+              </div>
+
+              <div class="field">
+                <label for="fixedAmount">Valor mensal</label>
+                <input id="fixedAmount" type="number" min="0.01" step="0.01" placeholder="0,00" required>
+              </div>
+
+              <div class="field">
+                <label for="fixedDay">Dia do mês</label>
+                <input id="fixedDay" type="number" min="1" max="31" placeholder="Ex.: 5" required>
+              </div>
+
+              <div class="field">
+                <label for="fixedStartMonth">Início</label>
+                <input id="fixedStartMonth" type="month" required>
+              </div>
+
+              <div class="field">
+                <label for="fixedPayment">Forma de pagamento</label>
+                <select id="fixedPayment" required>
+                  <option value="Dinheiro">Dinheiro</option>
+                  <option value="Pix">Pix</option>
+                  <option value="Débito">Débito</option>
+                  <option value="Crédito">Crédito</option>
+                  <option value="Transferência">Transferência</option>
+                  <option value="Boleto">Boleto</option>
+                  <option value="Outro">Outro</option>
+                </select>
+              </div>
+
+              <div class="field field-span-2 checkbox-row">
+                <label class="switch-row">
+                  <input id="fixedActive" type="checkbox" checked>
+                  <span>Ativo</span>
+                </label>
+              </div>
+
+              <div class="form-actions field-span-2">
+                <button type="submit" class="btn-primary">Salvar lançamento fixo</button>
+              </div>
+            </form>
+          </article>
+
+          <article class="card">
+            <div class="card-header">
+              <div>
+                <h3>Lançamentos fixos cadastrados</h3>
+                <p>Você pode pausar ou excluir um lançamento fixo a qualquer momento.</p>
+              </div>
+            </div>
+            <div id="fixedList" class="list-stack empty-state-inline">Nenhum lançamento fixo cadastrado.</div>
+          </article>
         </section>
       </section>
 
@@ -259,7 +345,7 @@
               </div>
               <div class="field">
                 <label for="categoryName">Nome da categoria</label>
-                <input id="categoryName" type="text" maxlength="40" placeholder="Ex.: Academia, Dividendos, Reserva" required />
+                <input id="categoryName" type="text" maxlength="40" placeholder="Ex.: Freelance, Tesouro Selic" required>
               </div>
               <div class="form-actions field-span-2">
                 <button type="submit" class="btn-primary">Adicionar categoria</button>
@@ -271,664 +357,861 @@
             <div class="card-header">
               <div>
                 <h3>Lista de categorias</h3>
-                <p>As categorias padrão não podem ser excluídas.</p>
+                <p>Exclua apenas categorias personalizadas que não estiverem em uso.</p>
               </div>
             </div>
-            <div id="categoriesList"></div>
+            <div id="categoriesList" class="list-stack empty-state-inline">Nenhuma categoria cadastrada.</div>
           </article>
         </section>
       </section>
     </main>
   </div>
 
-  <script>
-    const STORAGE_KEYS = {
-      userName: 'gf_user_name_v2',
-      entries: 'gf_entries_v2',
-      categories: 'gf_categories_v2',
-      budgets: 'gf_budgets_v2'
-    };
+<script>
+(() => {
+  const STORAGE_KEYS = {
+    userName: 'gf_user_name',
+    manualEntries: 'gf_manual_entries_v7',
+    fixedItems: 'gf_fixed_items_v7',
+    budgets: 'gf_budgets_v7',
+    categories: 'gf_categories_v7',
+    period: 'gf_period_v2',
+    skippedOccurrences: 'gf_skipped_occurrences_v1'
+  };
 
-    const DEFAULT_CATEGORIES = [
-      { id: uid(), name: 'Salário', type: 'income', default: true },
-      { id: uid(), name: 'Freelance', type: 'income', default: true },
-      { id: uid(), name: 'Vendas', type: 'income', default: true },
-      { id: uid(), name: 'Dividendos', type: 'income', default: true },
-      { id: uid(), name: 'Outras receitas', type: 'income', default: true },
-      { id: uid(), name: 'Comida', type: 'expense', default: true },
-      { id: uid(), name: 'Farmácia', type: 'expense', default: true },
-      { id: uid(), name: 'Mercado', type: 'expense', default: true },
-      { id: uid(), name: 'Transporte', type: 'expense', default: true },
-      { id: uid(), name: 'Moradia', type: 'expense', default: true },
-      { id: uid(), name: 'Lazer', type: 'expense', default: true },
-      { id: uid(), name: 'Educação', type: 'expense', default: true },
-      { id: uid(), name: 'Saúde', type: 'expense', default: true },
-      { id: uid(), name: 'Contas', type: 'expense', default: true },
-      { id: uid(), name: 'Assinaturas', type: 'expense', default: true },
-      { id: uid(), name: 'Outros gastos', type: 'expense', default: true },
-      { id: uid(), name: 'Renda fixa', type: 'investment', default: true },
-      { id: uid(), name: 'Ações', type: 'investment', default: true },
-      { id: uid(), name: 'Fundos', type: 'investment', default: true },
-      { id: uid(), name: 'Cripto', type: 'investment', default: true },
-      { id: uid(), name: 'Reserva', type: 'investment', default: true }
-    ];
+  const TYPE_META = {
+    income: { label: 'Receita', prefix: 'Receita', className: 'income' },
+    expense: { label: 'Despesa', prefix: 'Despesa', className: 'expense' },
+    investment: { label: 'Investimento', prefix: 'Investimento', className: 'investment' }
+  };
 
-    const state = {
-      userName: '',
-      entries: loadFromStorage(STORAGE_KEYS.entries, []),
-      categories: loadFromStorage(STORAGE_KEYS.categories, DEFAULT_CATEGORIES),
-      budgets: loadFromStorage(STORAGE_KEYS.budgets, {}),
-      editingEntryId: null,
-      charts: {},
-      currentPeriod: 'day'
-    };
+  const defaultCategories = [
+    { id: 'exp-food', name: 'Comida', type: 'expense', locked: true },
+    { id: 'exp-pharmacy', name: 'Farmácia', type: 'expense', locked: true },
+    { id: 'exp-market', name: 'Mercado', type: 'expense', locked: true },
+    { id: 'exp-transport', name: 'Transporte', type: 'expense', locked: true },
+    { id: 'exp-housing', name: 'Moradia', type: 'expense', locked: true },
+    { id: 'exp-leisure', name: 'Lazer', type: 'expense', locked: true },
+    { id: 'exp-education', name: 'Educação', type: 'expense', locked: true },
+    { id: 'exp-health', name: 'Saúde', type: 'expense', locked: true },
+    { id: 'exp-bills', name: 'Contas', type: 'expense', locked: true },
+    { id: 'exp-subscriptions', name: 'Assinaturas', type: 'expense', locked: true },
+    { id: 'exp-other', name: 'Outros gastos', type: 'expense', locked: true },
+    { id: 'inc-salary', name: 'Salário', type: 'income', locked: true },
+    { id: 'inc-bonus', name: 'Bônus', type: 'income', locked: true },
+    { id: 'inc-freelance', name: 'Freelance', type: 'income', locked: true },
+    { id: 'inc-sales', name: 'Vendas', type: 'income', locked: true },
+    { id: 'inc-other', name: 'Outras receitas', type: 'income', locked: true },
+    { id: 'inv-cdb', name: 'CDB', type: 'investment', locked: true },
+    { id: 'inv-tesouro', name: 'Tesouro Direto', type: 'investment', locked: true },
+    { id: 'inv-acoes', name: 'Ações', type: 'investment', locked: true },
+    { id: 'inv-fii', name: 'Fundos Imobiliários', type: 'investment', locked: true },
+    { id: 'inv-cripto', name: 'Cripto', type: 'investment', locked: true },
+    { id: 'inv-reserva', name: 'Reserva', type: 'investment', locked: true }
+  ];
 
-    const entryForm = document.getElementById('entryForm');
-    const entryType = document.getElementById('entryType');
-    const entryCategory = document.getElementById('entryCategory');
-    const entryDescription = document.getElementById('entryDescription');
-    const entryAmount = document.getElementById('entryAmount');
-    const entryDate = document.getElementById('entryDate');
-    const entryPayment = document.getElementById('entryPayment');
-    const saveButton = document.getElementById('saveButton');
-    const cancelEditButton = document.getElementById('cancelEditButton');
+  const currency = (value) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(value || 0));
+  const monthFormatter = new Intl.DateTimeFormat('pt-BR', { month: 'long', year: 'numeric' });
 
-    const balanceValue = document.getElementById('balanceValue');
-    const incomeValue = document.getElementById('incomeValue');
-    const expenseValue = document.getElementById('expenseValue');
-    const investmentValue = document.getElementById('investmentValue');
-    const topCategories = document.getElementById('topCategories');
-    const statementList = document.getElementById('statementList');
-    const budgetsList = document.getElementById('budgetsList');
-    const categoriesList = document.getElementById('categoriesList');
-    const budgetForm = document.getElementById('budgetForm');
-    const budgetCategory = document.getElementById('budgetCategory');
-    const budgetAmount = document.getElementById('budgetAmount');
-    const categoryForm = document.getElementById('categoryForm');
-    const categoryType = document.getElementById('categoryType');
-    const categoryName = document.getElementById('categoryName');
-    const periodRangeLabel = document.getElementById('periodRangeLabel');
-    const brandIcon = document.getElementById('brandIcon');
-    const userGreeting = document.getElementById('userGreeting');
-    const nameModal = document.getElementById('nameModal');
-    const nameForm = document.getElementById('nameForm');
-    const userNameInput = document.getElementById('userNameInput');
+  let manualEntries = load(STORAGE_KEYS.manualEntries, []);
+  let fixedItems = load(STORAGE_KEYS.fixedItems, []);
+  let budgets = load(STORAGE_KEYS.budgets, {});
+  let categories = ensureDefaultCategories(load(STORAGE_KEYS.categories, defaultCategories));
+  let selectedPeriod = load(STORAGE_KEYS.period, 'month');
+  let skippedOccurrences = load(STORAGE_KEYS.skippedOccurrences, []);
+  let editingId = null;
+  let categoryChart = null;
+  let flowChart = null;
 
-    entryDate.value = todayISO();
-    init();
+  const els = {
+    nameModal: document.getElementById('nameModal'),
+    nameForm: document.getElementById('nameForm'),
+    userNameInput: document.getElementById('userNameInput'),
+    brandIcon: document.getElementById('brandIcon'),
+    userGreeting: document.getElementById('userGreeting'),
+    periodButtons: document.getElementById('periodButtons'),
+    periodRangeLabel: document.getElementById('periodRangeLabel'),
+    balanceValue: document.getElementById('balanceValue'),
+    incomeValue: document.getElementById('incomeValue'),
+    expenseValue: document.getElementById('expenseValue'),
+    investmentValue: document.getElementById('investmentValue'),
+    topCategories: document.getElementById('topCategories'),
+    statementList: document.getElementById('statementList'),
+    entryForm: document.getElementById('entryForm'),
+    entryType: document.getElementById('entryType'),
+    entryCategory: document.getElementById('entryCategory'),
+    entryDescription: document.getElementById('entryDescription'),
+    entryAmount: document.getElementById('entryAmount'),
+    entryDate: document.getElementById('entryDate'),
+    entryPayment: document.getElementById('entryPayment'),
+    saveButton: document.getElementById('saveButton'),
+    cancelEditButton: document.getElementById('cancelEditButton'),
+    fixedForm: document.getElementById('fixedForm'),
+    fixedType: document.getElementById('fixedType'),
+    fixedCategory: document.getElementById('fixedCategory'),
+    fixedDescription: document.getElementById('fixedDescription'),
+    fixedAmount: document.getElementById('fixedAmount'),
+    fixedDay: document.getElementById('fixedDay'),
+    fixedStartMonth: document.getElementById('fixedStartMonth'),
+    fixedPayment: document.getElementById('fixedPayment'),
+    fixedActive: document.getElementById('fixedActive'),
+    fixedList: document.getElementById('fixedList'),
+    budgetForm: document.getElementById('budgetForm'),
+    budgetCategory: document.getElementById('budgetCategory'),
+    budgetAmount: document.getElementById('budgetAmount'),
+    budgetsList: document.getElementById('budgetsList'),
+    categoryForm: document.getElementById('categoryForm'),
+    categoryType: document.getElementById('categoryType'),
+    categoryName: document.getElementById('categoryName'),
+    categoriesList: document.getElementById('categoriesList')
+  };
 
-    function init() {
-      state.userName = localStorage.getItem(STORAGE_KEYS.userName) || '';
-      bindNavigation();
-      bindForms();
-      bindPeriods();
-      setupTypeOptions();
-      updateUserUI();
-      if (!state.userName.trim()) nameModal.classList.remove('hidden');
-      normalizeData();
-      renderAll();
+  function load(key, fallback) {
+    try {
+      const raw = localStorage.getItem(key);
+      return raw ? JSON.parse(raw) : fallback;
+    } catch {
+      return fallback;
+    }
+  }
+
+  function save(key, value) {
+    localStorage.setItem(key, JSON.stringify(value));
+  }
+
+  function ensureDefaultCategories(current) {
+    const map = new Map((Array.isArray(current) ? current : []).map(item => [item.id, item]));
+    defaultCategories.forEach(item => {
+      if (!map.has(item.id)) map.set(item.id, item);
+    });
+    return Array.from(map.values());
+  }
+
+  function todayStr() {
+    return new Date().toISOString().split('T')[0];
+  }
+
+  function currentMonthStr() {
+    const now = new Date();
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+  }
+
+  function normalizeText(value) {
+    return String(value || '').trim().replace(/\s+/g, ' ');
+  }
+
+  function formatDate(dateString) {
+    return new Intl.DateTimeFormat('pt-BR', { timeZone: 'UTC' }).format(new Date(`${dateString}T00:00:00`));
+  }
+
+  function getUserName() {
+    return localStorage.getItem(STORAGE_KEYS.userName) || '';
+  }
+
+  function setUserName(name) {
+    localStorage.setItem(STORAGE_KEYS.userName, name);
+    renderUser();
+  }
+
+  function renderUser() {
+    const name = getUserName();
+    els.brandIcon.textContent = name ? name.charAt(0).toUpperCase() : 'G';
+    els.userGreeting.textContent = name ? `Olá, ${name}` : 'Olá';
+  }
+
+  function checkUserName() {
+    const name = getUserName();
+    renderUser();
+    if (!name) {
+      els.nameModal.classList.remove('hidden');
+      els.userNameInput.focus();
+    }
+  }
+
+  function fillTypeSelect(selectEl) {
+    selectEl.innerHTML = Object.entries(TYPE_META)
+      .map(([value, meta]) => `<option value="${value}">${meta.label}</option>`)
+      .join('');
+  }
+
+  function getCategoriesByType(type) {
+    return categories.filter(item => item.type === type).sort((a, b) => a.name.localeCompare(b.name, 'pt-BR'));
+  }
+
+  function fillEntryCategories(type) {
+    els.entryCategory.innerHTML = getCategoriesByType(type)
+      .map(category => `<option value="${category.id}">${category.name}</option>`)
+      .join('');
+  }
+
+  function fillFixedCategories(type) {
+    els.fixedCategory.innerHTML = getCategoriesByType(type)
+      .map(category => `<option value="${category.id}">${category.name}</option>`)
+      .join('');
+  }
+
+  function fillBudgetCategories() {
+    els.budgetCategory.innerHTML = getCategoriesByType('expense')
+      .map(category => `<option value="${category.id}">${category.name}</option>`)
+      .join('');
+  }
+
+  function getCategoryById(id) {
+    return categories.find(item => item.id === id);
+  }
+
+  function getDateRange(period) {
+    const now = new Date();
+    const current = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    let start = null;
+    let end = new Date(current);
+    end.setDate(end.getDate() + 1);
+
+    if (period === 'day') {
+      start = current;
+    } else if (period === 'week') {
+      start = new Date(current);
+      const day = start.getDay();
+      const diff = day === 0 ? 6 : day - 1;
+      start.setDate(start.getDate() - diff);
+      end = new Date(start);
+      end.setDate(end.getDate() + 7);
+    } else if (period === 'month') {
+      start = new Date(current.getFullYear(), current.getMonth(), 1);
+      end = new Date(current.getFullYear(), current.getMonth() + 1, 1);
     }
 
-    function normalizeData() {
-      let changed = false;
-      state.entries = state.entries.map(entry => {
-        if (!entry.type) {
-          changed = true;
-          entry.type = 'expense';
-        }
-        if (!entry.categoryName) {
-          const category = state.categories.find(c => c.id === entry.categoryId);
-          entry.categoryName = category?.name || 'Sem categoria';
-          changed = true;
-        }
-        return entry;
-      });
-      if (changed) saveEntries();
+    return { start, end };
+  }
+
+  function isInSelectedPeriod(dateString) {
+    if (selectedPeriod === 'all') return true;
+    const { start, end } = getDateRange(selectedPeriod);
+    const value = new Date(`${dateString}T00:00:00`);
+    return value >= start && value < end;
+  }
+
+  function makeOccurrenceDate(monthStr, day) {
+    const [year, month] = monthStr.split('-').map(Number);
+    const safeDay = Math.max(1, Math.min(Number(day), new Date(year, month, 0).getDate()));
+    return `${year}-${String(month).padStart(2, '0')}-${String(safeDay).padStart(2, '0')}`;
+  }
+
+  function monthListBetween(startMonth, endMonth) {
+    const months = [];
+    const [startYear, startM] = startMonth.split('-').map(Number);
+    const [endYear, endM] = endMonth.split('-').map(Number);
+    let current = new Date(startYear, startM - 1, 1);
+    const limit = new Date(endYear, endM - 1, 1);
+
+    while (current <= limit) {
+      months.push(`${current.getFullYear()}-${String(current.getMonth() + 1).padStart(2, '0')}`);
+      current.setMonth(current.getMonth() + 1);
     }
 
-    function bindNavigation() {
-      const navButtons = document.querySelectorAll('.nav-link');
-      navButtons.forEach(button => {
-        button.addEventListener('click', () => {
-          navButtons.forEach(btn => btn.classList.remove('active'));
-          button.classList.add('active');
-          document.querySelectorAll('.page-section').forEach(section => section.classList.remove('active'));
-          document.getElementById(button.dataset.section).classList.add('active');
+    return months;
+  }
+
+  function getRecurringEntries() {
+    const nowMonth = currentMonthStr();
+    const records = [];
+
+    fixedItems.forEach(item => {
+      if (!item.active) return;
+      monthListBetween(item.startMonth, nowMonth).forEach(monthStr => {
+        const occurrenceKey = `${item.id}_${monthStr}`;
+        if (skippedOccurrences.includes(occurrenceKey)) return;
+        records.push({
+          id: occurrenceKey,
+          source: 'fixed',
+          fixedId: item.id,
+          occurrenceKey,
+          type: item.type,
+          categoryId: item.categoryId,
+          categoryName: item.categoryName,
+          description: item.description,
+          amount: item.amount,
+          date: makeOccurrenceDate(monthStr, item.day),
+          payment: item.payment,
+          fixedLabel: 'Fixo mensal'
         });
       });
+    });
+
+    return records;
+  }
+
+  function getAllEntries() {
+    const manual = manualEntries.map(item => ({ ...item, source: 'manual' }));
+    return [...manual, ...getRecurringEntries()].sort((a, b) => new Date(`${b.date}T00:00:00`) - new Date(`${a.date}T00:00:00`));
+  }
+
+  function getFilteredEntries() {
+    return getAllEntries().filter(item => isInSelectedPeriod(item.date));
+  }
+
+  function totalByType(items, type) {
+    return items.filter(item => item.type === type).reduce((sum, item) => sum + Number(item.amount || 0), 0);
+  }
+
+  function renderPeriodHeader() {
+    const labels = { day: 'Hoje', week: 'Esta semana', month: 'Este mês', all: 'Todo o histórico' };
+    document.querySelectorAll('.period-btn').forEach(button => {
+      button.classList.toggle('active', button.dataset.period === selectedPeriod);
+    });
+
+    if (selectedPeriod === 'all') {
+      els.periodRangeLabel.textContent = labels[selectedPeriod];
+      return;
     }
 
-    function bindForms() {
-      entryForm.addEventListener('submit', handleEntrySubmit);
-      entryType.addEventListener('change', () => populateCategorySelect(entryType.value, entryCategory, false));
-      cancelEditButton.addEventListener('click', resetEntryForm);
-      budgetForm.addEventListener('submit', handleBudgetSubmit);
-      categoryForm.addEventListener('submit', handleCategorySubmit);
-      nameForm.addEventListener('submit', handleNameSubmit);
-    }
+    const { start, end } = getDateRange(selectedPeriod);
+    const adjustedEnd = new Date(end);
+    adjustedEnd.setDate(adjustedEnd.getDate() - 1);
+    const formatter = new Intl.DateTimeFormat('pt-BR');
+    els.periodRangeLabel.textContent = `${labels[selectedPeriod]} · ${formatter.format(start)} até ${formatter.format(adjustedEnd)}`;
+  }
 
-    function bindPeriods() {
-      document.querySelectorAll('.period-btn').forEach(button => {
-        button.addEventListener('click', () => {
-          document.querySelectorAll('.period-btn').forEach(btn => btn.classList.remove('active'));
-          button.classList.add('active');
-          state.currentPeriod = button.dataset.period;
-          renderAll();
-        });
+  function renderSummary(filteredEntries) {
+    const income = totalByType(filteredEntries, 'income');
+    const expense = totalByType(filteredEntries, 'expense');
+    const investment = totalByType(filteredEntries, 'investment');
+    const balance = income - expense - investment;
+
+    els.incomeValue.textContent = currency(income);
+    els.expenseValue.textContent = currency(expense);
+    els.investmentValue.textContent = currency(investment);
+    els.balanceValue.textContent = currency(balance);
+  }
+
+  function renderTopCategories(filteredEntries) {
+    const grouped = {};
+    filteredEntries
+      .filter(item => item.type === 'expense' || item.type === 'investment')
+      .forEach(item => {
+        grouped[item.categoryName] = (grouped[item.categoryName] || 0) + item.amount;
       });
+
+    const sorted = Object.entries(grouped).sort((a, b) => b[1] - a[1]).slice(0, 6);
+    if (!sorted.length) {
+      els.topCategories.className = 'list-stack empty-state-inline';
+      els.topCategories.textContent = 'Nenhuma saída cadastrada no período.';
+      return;
     }
 
-    function handleNameSubmit(event) {
-      event.preventDefault();
-      const name = userNameInput.value.trim();
-      if (!name) return;
-      state.userName = capitalize(name);
-      localStorage.setItem(STORAGE_KEYS.userName, state.userName);
-      updateUserUI();
-      nameModal.classList.add('hidden');
-    }
-
-    function updateUserUI() {
-      const name = state.userName?.trim();
-      if (name) {
-        userGreeting.textContent = `Olá, ${name}`;
-        brandIcon.textContent = name.charAt(0).toUpperCase();
-      } else {
-        userGreeting.textContent = 'Olá';
-        brandIcon.textContent = 'G';
-      }
-    }
-
-    function setupTypeOptions() {
-      entryType.innerHTML = `
-        <option value="income">Receita</option>
-        <option value="expense">Despesa</option>
-        <option value="investment">Investimento</option>
-      `;
-      entryType.value = 'income';
-      populateCategorySelect(entryType.value, entryCategory, false);
-      populateBudgetCategories();
-    }
-
-    function handleEntrySubmit(event) {
-      event.preventDefault();
-      const categoryId = entryCategory.value;
-      const category = state.categories.find(item => item.id === categoryId);
-      const payload = {
-        id: state.editingEntryId || uid(),
-        type: entryType.value,
-        categoryId,
-        categoryName: category?.name || 'Sem categoria',
-        description: entryDescription.value.trim(),
-        amount: Number(entryAmount.value),
-        date: entryDate.value,
-        paymentMethod: entryPayment.value,
-        createdAt: new Date().toISOString()
-      };
-      if (!payload.description || !payload.date || !payload.amount || !categoryId) return;
-      if (state.editingEntryId) {
-        const index = state.entries.findIndex(entry => entry.id === state.editingEntryId);
-        if (index >= 0) state.entries[index] = payload;
-      } else {
-        state.entries.unshift(payload);
-      }
-      saveEntries();
-      resetEntryForm();
-      renderAll();
-    }
-
-    function handleBudgetSubmit(event) {
-      event.preventDefault();
-      const categoryId = budgetCategory.value;
-      const amount = Number(budgetAmount.value);
-      if (!categoryId || !amount) return;
-      state.budgets[categoryId] = amount;
-      saveBudgets();
-      budgetForm.reset();
-      renderBudgets();
-    }
-
-    function handleCategorySubmit(event) {
-      event.preventDefault();
-      const name = categoryName.value.trim();
-      const type = categoryType.value;
-      if (!name) return;
-      const exists = state.categories.some(category => category.type === type && category.name.toLowerCase() === name.toLowerCase());
-      if (exists) {
-        alert('Essa categoria já existe para esse tipo.');
-        return;
-      }
-      state.categories.push({ id: uid(), name, type, default: false });
-      saveCategories();
-      categoryForm.reset();
-      renderAll();
-    }
-
-    function renderAll() {
-      populateCategorySelect(entryType.value, entryCategory, true);
-      populateBudgetCategories();
-      renderSummary();
-      renderTopCategories();
-      renderStatement();
-      renderBudgets();
-      renderCategories();
-      renderCharts();
-    }
-
-    function getFilteredEntries() {
-      const now = new Date();
-      const todayStart = startOfDay(now);
-      const todayEnd = endOfDay(now);
-      const weekStart = startOfWeek(now);
-      const monthStart = startOfMonth(now);
-      return state.entries.filter(entry => {
-        const entryDateObj = new Date(entry.date + 'T12:00:00');
-        if (state.currentPeriod === 'day') return entryDateObj >= todayStart && entryDateObj <= todayEnd;
-        if (state.currentPeriod === 'week') return entryDateObj >= weekStart && entryDateObj <= todayEnd;
-        if (state.currentPeriod === 'month') return entryDateObj >= monthStart && entryDateObj <= todayEnd;
-        return true;
-      }).sort((a,b) => new Date(b.date) - new Date(a.date) || new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
-    }
-
-    function updatePeriodLabel() {
-      const now = new Date();
-      if (state.currentPeriod === 'day') {
-        periodRangeLabel.textContent = `Período: ${formatDate(todayISO())}`;
-      } else if (state.currentPeriod === 'week') {
-        periodRangeLabel.textContent = `Período: ${formatDate(toISO(startOfWeek(now)))} até ${formatDate(todayISO())}`;
-      } else if (state.currentPeriod === 'month') {
-        periodRangeLabel.textContent = `Período: ${formatDate(toISO(startOfMonth(now)))} até ${formatDate(todayISO())}`;
-      } else {
-        periodRangeLabel.textContent = 'Período: todos os registros';
-      }
-    }
-
-    function renderSummary() {
-      updatePeriodLabel();
-      const filtered = getFilteredEntries();
-      const income = sumByType(filtered, 'income');
-      const expense = sumByType(filtered, 'expense');
-      const investment = sumByType(filtered, 'investment');
-      const balance = income - expense - investment;
-      balanceValue.textContent = formatCurrency(balance);
-      incomeValue.textContent = formatCurrency(income);
-      expenseValue.textContent = formatCurrency(expense);
-      investmentValue.textContent = formatCurrency(investment);
-    }
-
-    function renderTopCategories() {
-      const filtered = getFilteredEntries().filter(entry => entry.type === 'expense' || entry.type === 'investment');
-      const totals = {};
-      filtered.forEach(entry => {
-        const key = `${entry.type}:${entry.categoryName}`;
-        totals[key] = totals[key] || { name: entry.categoryName, type: entry.type, total: 0 };
-        totals[key].total += entry.amount;
-      });
-      const ordered = Object.values(totals).sort((a,b) => b.total - a.total).slice(0, 6);
-      if (!ordered.length) {
-        topCategories.className = 'list-stack empty-state-inline';
-        topCategories.textContent = 'Nenhuma saída cadastrada no período.';
-        return;
-      }
-      topCategories.className = 'list-stack';
-      topCategories.innerHTML = ordered.map(item => `
-        <div class="list-item">
-          <div class="list-main">
-            <strong>${escapeHtml(item.name)}</strong>
-            <small>${item.type === 'investment' ? 'Investimento' : 'Despesa'}</small>
-          </div>
-          <div class="list-side emphasis">${formatCurrency(item.total)}</div>
+    els.topCategories.className = 'list-stack';
+    els.topCategories.innerHTML = sorted.map(([name, amount], index) => `
+      <div class="list-item compact">
+        <div class="list-main">
+          <strong>${index + 1}. ${name}</strong>
+          <small>Maior impacto no período filtrado</small>
         </div>
-      `).join('');
+        <div class="list-side emphasis">${currency(amount)}</div>
+      </div>
+    `).join('');
+  }
+
+  function renderStatement(filteredEntries) {
+    if (!filteredEntries.length) {
+      els.statementList.className = 'list-stack empty-state-inline';
+      els.statementList.textContent = 'Nenhum registro cadastrado.';
+      return;
     }
 
-    function renderStatement() {
-      const filtered = getFilteredEntries();
-      if (!filtered.length) {
-        statementList.className = 'list-stack empty-state-inline';
-        statementList.textContent = 'Nenhum registro cadastrado.';
-        return;
-      }
-      statementList.className = 'list-stack';
-      statementList.innerHTML = filtered.map(entry => `
+    els.statementList.className = 'list-stack';
+    els.statementList.innerHTML = filteredEntries.map(entry => `
+      <div class="list-item statement-item">
+        <div class="statement-main">
+          <div class="statement-topline">
+            <strong>${entry.description}</strong>
+            <span class="statement-value ${TYPE_META[entry.type].className}">${currency(entry.amount)}</span>
+          </div>
+          <div class="statement-meta">
+            <span class="badge ${TYPE_META[entry.type].className}">${TYPE_META[entry.type].prefix} (${entry.categoryName})</span>
+            <span>${formatDate(entry.date)}</span>
+            <span>${entry.payment}</span>
+            <span>${entry.source === 'fixed' ? 'Fixo mensal' : 'Manual'}</span>
+          </div>
+        </div>
+        <div class="statement-actions">
+          ${entry.source === 'manual'
+            ? `<button class="btn-link" data-action="edit" data-id="${entry.id}">Editar</button>`
+            : ''}
+          <button class="btn-link danger" data-action="remove" data-id="${entry.id}" data-source="${entry.source}">Excluir</button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function renderBudgets() {
+    const expenseCategories = getCategoriesByType('expense');
+    const monthEntries = getAllEntries().filter(item => {
+      const nowMonth = currentMonthStr();
+      return item.date.startsWith(nowMonth) && item.type === 'expense';
+    });
+
+    const items = Object.entries(budgets).map(([categoryId, limit]) => {
+      const category = getCategoryById(categoryId);
+      if (!category) return null;
+      const spent = monthEntries.filter(item => item.categoryId === categoryId).reduce((sum, item) => sum + item.amount, 0);
+      const percent = limit > 0 ? (spent / limit) * 100 : 0;
+      const barClass = percent < 75 ? 'safe-bar' : percent < 100 ? 'warning-bar' : 'danger-bar';
+
+      return `
+        <div class="budget-card">
+          <div class="budget-header-row">
+            <div>
+              <strong>${category.name}</strong>
+              <div class="muted-text">${currency(spent)} de ${currency(limit)}</div>
+            </div>
+            <button class="btn-link danger" data-budget-remove="${categoryId}">Remover</button>
+          </div>
+          <div class="progress-track ${barClass}"><span style="width:${Math.min(percent, 100)}%"></span></div>
+          <div class="muted-text">${percent.toFixed(1)}% utilizado</div>
+        </div>
+      `;
+    }).filter(Boolean);
+
+    if (!items.length) {
+      els.budgetsList.className = 'list-stack empty-state-inline';
+      els.budgetsList.textContent = 'Nenhum orçamento definido.';
+      return;
+    }
+
+    els.budgetsList.className = 'list-stack';
+    els.budgetsList.innerHTML = items.join('');
+
+    if (!expenseCategories.length) fillBudgetCategories();
+  }
+
+  function renderCategories() {
+    const groups = ['expense', 'income', 'investment'].map(type => {
+      const items = getCategoriesByType(type);
+      const title = TYPE_META[type].label;
+      return `
+        <div class="category-group">
+          <h4>${title}</h4>
+          <div class="list-stack">
+            ${items.map(category => `
+              <div class="list-item compact">
+                <div class="list-main">
+                  <strong>${category.name}</strong>
+                  <small>${category.locked ? 'Categoria padrão do sistema' : 'Categoria personalizada'}</small>
+                </div>
+                <div class="list-side">
+                  ${category.locked
+                    ? '<span class="tag-muted">Protegida</span>'
+                    : `<button class="btn-link danger" data-category-remove="${category.id}">Excluir</button>`}
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }).join('');
+
+    els.categoriesList.className = 'list-stack';
+    els.categoriesList.innerHTML = groups;
+  }
+
+  function renderFixedItems() {
+    if (!fixedItems.length) {
+      els.fixedList.className = 'list-stack empty-state-inline';
+      els.fixedList.textContent = 'Nenhum lançamento fixo cadastrado.';
+      return;
+    }
+
+    els.fixedList.className = 'list-stack';
+    els.fixedList.innerHTML = fixedItems
+      .sort((a, b) => a.description.localeCompare(b.description, 'pt-BR'))
+      .map(item => `
         <div class="list-item statement-item">
           <div class="statement-main">
             <div class="statement-topline">
-              <strong>${escapeHtml(entry.description)}</strong>
-              <span class="statement-value ${entry.type}">${formatCurrency(entry.amount)}</span>
+              <strong>${item.description}</strong>
+              <span class="statement-value ${TYPE_META[item.type].className}">${currency(item.amount)}</span>
             </div>
             <div class="statement-meta">
-              <span class="badge ${entry.type}">${typeLabel(entry.type)} (${escapeHtml(entry.categoryName)})</span>
-              <span>${formatDate(entry.date)}</span>
-              <span>${escapeHtml(entry.paymentMethod)}</span>
+              <span class="badge ${TYPE_META[item.type].className}">${TYPE_META[item.type].prefix} (${item.categoryName})</span>
+              <span>Todo dia ${String(item.day).padStart(2, '0')}</span>
+              <span>Desde ${monthFormatter.format(new Date(`${item.startMonth}-01T00:00:00`))}</span>
+              <span>${item.payment}</span>
+              <span>${item.active ? 'Ativo' : 'Pausado'}</span>
             </div>
           </div>
           <div class="statement-actions">
-            <button class="btn-link" onclick="editEntry('${entry.id}')">Editar</button>
-            <button class="btn-link danger" onclick="deleteEntry('${entry.id}')">Excluir</button>
+            <button class="btn-link" data-fixed-toggle="${item.id}">${item.active ? 'Pausar' : 'Ativar'}</button>
+            <button class="btn-link danger" data-fixed-remove="${item.id}">Excluir</button>
           </div>
         </div>
       `).join('');
-    }
+  }
 
-    function renderBudgets() {
-      const budgetIds = Object.keys(state.budgets);
-      if (!budgetIds.length) {
-        budgetsList.className = 'list-stack empty-state-inline';
-        budgetsList.textContent = 'Nenhum orçamento definido.';
-        return;
-      }
-      const monthEntries = state.entries.filter(entry => entry.type === 'expense' && isSameMonth(entry.date, todayISO()));
-      budgetsList.className = 'list-stack';
-      budgetsList.innerHTML = budgetIds.map(categoryId => {
-        const budget = Number(state.budgets[categoryId] || 0);
-        const category = state.categories.find(item => item.id === categoryId);
-        if (!category) return '';
-        const spent = monthEntries.filter(entry => entry.categoryId === categoryId).reduce((sum, entry) => sum + entry.amount, 0);
-        const percent = budget ? Math.min((spent / budget) * 100, 100) : 0;
-        const barClass = percent >= 100 ? 'danger-bar' : percent >= 80 ? 'warning-bar' : 'safe-bar';
-        return `
-          <div class="budget-card">
-            <div class="budget-header-row">
-              <strong>${escapeHtml(category.name)}</strong>
-              <div class="budget-actions">
-                <span>${formatCurrency(spent)} de ${formatCurrency(budget)}</span>
-                <button class="btn-link danger" onclick="removeBudget('${categoryId}')">Remover</button>
-              </div>
-            </div>
-            <div class="progress-track ${barClass}"><span style="width:${percent}%"></span></div>
-            <small>${percent.toFixed(1)}% utilizado</small>
-          </div>
-        `;
-      }).join('');
-    }
-
-    function renderCategories() {
-      const groups = [
-        { label: 'Receitas', type: 'income' },
-        { label: 'Despesas', type: 'expense' },
-        { label: 'Investimentos', type: 'investment' }
-      ];
-      categoriesList.innerHTML = groups.map(group => {
-        const items = state.categories.filter(category => category.type === group.type);
-        return `
-          <div class="category-group">
-            <h4>${group.label}</h4>
-            <div class="list-stack">
-              ${items.map(renderCategoryItem).join('')}
-            </div>
-          </div>
-        `;
-      }).join('');
-    }
-
-    function renderCategoryItem(category) {
-      return `
-        <div class="list-item compact">
-          <div class="list-main">
-            <strong>${escapeHtml(category.name)}</strong>
-            <span class="badge ${category.type}">${typeLabel(category.type)}</span>
-          </div>
-          <div class="list-side">
-            ${category.default ? '<span class="muted-text">Padrão</span>' : `<button class="btn-link danger" onclick="deleteCategory('${category.id}')">Excluir</button>`}
-          </div>
-        </div>
-      `;
-    }
-
-    function renderCharts() {
-      renderCategoryChart();
-      renderFlowChart();
-    }
-
-    function renderCategoryChart() {
-      const filtered = getFilteredEntries().filter(entry => entry.type === 'expense' || entry.type === 'investment');
-      const totals = {};
-      filtered.forEach(entry => {
-        totals[entry.categoryName] = (totals[entry.categoryName] || 0) + entry.amount;
+  function buildCategoryChart(filteredEntries) {
+    const grouped = {};
+    filteredEntries
+      .filter(item => item.type === 'expense' || item.type === 'investment')
+      .forEach(item => {
+        grouped[item.categoryName] = (grouped[item.categoryName] || 0) + item.amount;
       });
-      const labels = Object.keys(totals);
-      const data = Object.values(totals);
-      const ctx = document.getElementById('categoryChart');
-      resetChart('category');
-      state.charts.category = new Chart(ctx, {
-        type: 'pie',
-        data: {
-          labels: labels.length ? labels : ['Sem dados'],
-          datasets: [{
-            data: data.length ? data : [1],
-            backgroundColor: ['#4f8cff', '#7c5cff', '#14b8a6', '#f59e0b', '#ef4444', '#8b5cf6', '#06b6d4', '#22c55e', '#f97316'],
-            borderColor: '#091325',
-            borderWidth: 2
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { display: false },
-            tooltip: {
-              callbacks: {
-                label: context => `${context.label}: ${formatCurrency(context.raw)}`
-              }
-            }
-          }
+
+    const labels = Object.keys(grouped);
+    const values = Object.values(grouped);
+    if (categoryChart) categoryChart.destroy();
+
+    categoryChart = new Chart(document.getElementById('categoryChart'), {
+      type: 'doughnut',
+      data: {
+        labels: labels.length ? labels : ['Sem dados'],
+        datasets: [{
+          data: values.length ? values : [1],
+          backgroundColor: labels.length
+            ? ['#4f8cff', '#22c55e', '#f59e0b', '#8b5cf6', '#ef4444', '#06b6d4', '#14b8a6', '#f97316']
+            : ['rgba(148,163,184,0.25)'],
+          borderWidth: 0
+        }]
+      },
+      options: {
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false }
         }
+      }
+    });
+  }
+
+  function buildFlowChart(filteredEntries) {
+    const labels = [];
+    const income = [];
+    const expense = [];
+    const investment = [];
+
+    if (selectedPeriod === 'day') {
+      labels.push('Hoje');
+      income.push(totalByType(filteredEntries, 'income'));
+      expense.push(totalByType(filteredEntries, 'expense'));
+      investment.push(totalByType(filteredEntries, 'investment'));
+    } else if (selectedPeriod === 'week') {
+      const range = getDateRange('week');
+      for (let i = 0; i < 7; i++) {
+        const d = new Date(range.start);
+        d.setDate(d.getDate() + i);
+        const dateKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        labels.push(new Intl.DateTimeFormat('pt-BR', { weekday: 'short' }).format(d));
+        const dayEntries = filteredEntries.filter(item => item.date === dateKey);
+        income.push(totalByType(dayEntries, 'income'));
+        expense.push(totalByType(dayEntries, 'expense'));
+        investment.push(totalByType(dayEntries, 'investment'));
+      }
+    } else if (selectedPeriod === 'month') {
+      const month = currentMonthStr();
+      const totalDays = new Date(Number(month.slice(0, 4)), Number(month.slice(5, 7)), 0).getDate();
+      for (let day = 1; day <= totalDays; day++) {
+        const dateKey = `${month}-${String(day).padStart(2, '0')}`;
+        labels.push(String(day));
+        const dayEntries = filteredEntries.filter(item => item.date === dateKey);
+        income.push(totalByType(dayEntries, 'income'));
+        expense.push(totalByType(dayEntries, 'expense'));
+        investment.push(totalByType(dayEntries, 'investment'));
+      }
+    } else {
+      const months = {};
+      filteredEntries.forEach(item => {
+        const key = item.date.slice(0, 7);
+        if (!months[key]) months[key] = { income: 0, expense: 0, investment: 0 };
+        months[key][item.type] += item.amount;
       });
+      Object.keys(months).sort().forEach(key => {
+        labels.push(new Intl.DateTimeFormat('pt-BR', { month: 'short', year: '2-digit' }).format(new Date(`${key}-01T00:00:00`)));
+        income.push(months[key].income);
+        expense.push(months[key].expense);
+        investment.push(months[key].investment);
+      });
+      if (!labels.length) {
+        labels.push('Sem dados');
+        income.push(0); expense.push(0); investment.push(0);
+      }
     }
 
-    function renderFlowChart() {
-      const filtered = getFilteredEntries();
-      const ctx = document.getElementById('flowChart');
-      resetChart('flow');
-      state.charts.flow = new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: ['Receitas', 'Despesas', 'Investimentos'],
-          datasets: [{
-            data: [sumByType(filtered, 'income'), sumByType(filtered, 'expense'), sumByType(filtered, 'investment')],
-            backgroundColor: ['#22c55e', '#ef4444', '#8b5cf6']
-          }]
+    if (flowChart) flowChart.destroy();
+    flowChart = new Chart(document.getElementById('flowChart'), {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [
+          { label: 'Receitas', data: income, backgroundColor: '#22c55e', borderRadius: 8 },
+          { label: 'Despesas', data: expense, backgroundColor: '#ef4444', borderRadius: 8 },
+          { label: 'Investimentos', data: investment, backgroundColor: '#f59e0b', borderRadius: 8 }
+        ]
+      },
+      options: {
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: { color: '#dbe8ff', boxWidth: 12, usePointStyle: true }
+          }
         },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { display: false },
-            tooltip: {
-              callbacks: {
-                label: context => formatCurrency(context.raw)
-              }
-            }
+        scales: {
+          x: {
+            ticks: { color: '#b8cae6' },
+            grid: { color: 'rgba(148,163,184,0.08)' }
           },
-          scales: {
-            x: {
-              ticks: { color: '#d9e5ff' },
-              grid: { color: 'rgba(148,163,184,0.08)' }
+          y: {
+            beginAtZero: true,
+            ticks: {
+              color: '#b8cae6',
+              callback: value => currency(value)
             },
-            y: {
-              beginAtZero: true,
-              ticks: {
-                color: '#d9e5ff',
-                callback: value => formatCurrency(value)
-              },
-              grid: { color: 'rgba(148,163,184,0.14)' }
-            }
+            grid: { color: 'rgba(148,163,184,0.08)' }
           }
         }
-      });
-    }
-
-    function populateCategorySelect(type, selectElement, preserveCurrent) {
-      const previous = selectElement.value;
-      const filtered = state.categories.filter(category => category.type === type);
-      selectElement.innerHTML = filtered.map(category => `
-        <option value="${category.id}">${typeLabel(type)} (${escapeHtml(category.name)})</option>
-      `).join('');
-      if (preserveCurrent && filtered.some(item => item.id === previous)) {
-        selectElement.value = previous;
       }
+    });
+  }
+
+  function refreshAll() {
+    save(STORAGE_KEYS.manualEntries, manualEntries);
+    save(STORAGE_KEYS.fixedItems, fixedItems);
+    save(STORAGE_KEYS.budgets, budgets);
+    save(STORAGE_KEYS.categories, categories);
+    save(STORAGE_KEYS.period, selectedPeriod);
+    save(STORAGE_KEYS.skippedOccurrences, skippedOccurrences);
+
+    fillEntryCategories(els.entryType.value || 'expense');
+    fillFixedCategories(els.fixedType.value || 'expense');
+    fillBudgetCategories();
+    renderPeriodHeader();
+    const filteredEntries = getFilteredEntries();
+    renderSummary(filteredEntries);
+    renderTopCategories(filteredEntries);
+    renderStatement(filteredEntries);
+    renderBudgets();
+    renderCategories();
+    renderFixedItems();
+    buildCategoryChart(filteredEntries);
+    buildFlowChart(filteredEntries);
+  }
+
+  function resetEntryForm() {
+    editingId = null;
+    els.entryForm.reset();
+    els.entryDate.value = todayStr();
+    els.entryType.value = 'expense';
+    fillEntryCategories('expense');
+    els.saveButton.textContent = 'Salvar registro';
+    els.cancelEditButton.classList.add('hidden');
+  }
+
+  function resetFixedForm() {
+    els.fixedForm.reset();
+    els.fixedType.value = 'expense';
+    fillFixedCategories('expense');
+    els.fixedStartMonth.value = currentMonthStr();
+    els.fixedDay.value = String(new Date().getDate());
+    els.fixedActive.checked = true;
+  }
+
+  function startEditEntry(id) {
+    const entry = manualEntries.find(item => item.id === id);
+    if (!entry) return;
+    editingId = id;
+    els.entryType.value = entry.type;
+    fillEntryCategories(entry.type);
+    els.entryCategory.value = entry.categoryId;
+    els.entryDescription.value = entry.description;
+    els.entryAmount.value = entry.amount;
+    els.entryDate.value = entry.date;
+    els.entryPayment.value = entry.payment;
+    els.saveButton.textContent = 'Salvar alterações';
+    els.cancelEditButton.classList.remove('hidden');
+    document.querySelector('[data-section="dashboardSection"]').click();
+    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+  }
+
+  document.querySelectorAll('.nav-link').forEach(button => {
+    button.addEventListener('click', () => {
+      document.querySelectorAll('.nav-link').forEach(item => item.classList.remove('active'));
+      button.classList.add('active');
+      document.querySelectorAll('.page-section').forEach(section => section.classList.remove('active'));
+      document.getElementById(button.dataset.section).classList.add('active');
+    });
+  });
+
+  els.nameForm.addEventListener('submit', event => {
+    event.preventDefault();
+    const name = normalizeText(els.userNameInput.value);
+    if (!name) return;
+    setUserName(name);
+    els.nameModal.classList.add('hidden');
+  });
+
+  els.periodButtons.addEventListener('click', event => {
+    const button = event.target.closest('.period-btn');
+    if (!button) return;
+    selectedPeriod = button.dataset.period;
+    refreshAll();
+  });
+
+  els.entryType.addEventListener('change', () => fillEntryCategories(els.entryType.value));
+  els.fixedType.addEventListener('change', () => fillFixedCategories(els.fixedType.value));
+
+  els.entryForm.addEventListener('submit', event => {
+    event.preventDefault();
+    const category = getCategoryById(els.entryCategory.value);
+    if (!category) return;
+
+    const payload = {
+      id: editingId || crypto.randomUUID(),
+      type: els.entryType.value,
+      categoryId: category.id,
+      categoryName: category.name,
+      description: normalizeText(els.entryDescription.value),
+      amount: Number(els.entryAmount.value),
+      date: els.entryDate.value,
+      payment: els.entryPayment.value
+    };
+
+    if (editingId) {
+      manualEntries = manualEntries.map(item => item.id === editingId ? payload : item);
+    } else {
+      manualEntries.push(payload);
     }
 
-    function populateBudgetCategories() {
-      const filtered = state.categories.filter(category => category.type === 'expense');
-      budgetCategory.innerHTML = filtered.map(category => `<option value="${category.id}">${escapeHtml(category.name)}</option>`).join('');
+    resetEntryForm();
+    refreshAll();
+  });
+
+  els.cancelEditButton.addEventListener('click', resetEntryForm);
+
+  els.statementList.addEventListener('click', event => {
+    const editButton = event.target.closest('[data-action="edit"]');
+    const removeButton = event.target.closest('[data-action="remove"]');
+
+    if (editButton) {
+      startEditEntry(editButton.dataset.id);
+      return;
     }
 
-    function editEntry(id) {
-      const entry = state.entries.find(item => item.id === id);
-      if (!entry) return;
-      state.editingEntryId = id;
-      entryType.value = entry.type;
-      populateCategorySelect(entry.type, entryCategory, false);
-      entryCategory.value = entry.categoryId;
-      entryDescription.value = entry.description;
-      entryAmount.value = entry.amount;
-      entryDate.value = entry.date;
-      entryPayment.value = entry.paymentMethod;
-      saveButton.textContent = 'Atualizar registro';
-      cancelEditButton.classList.remove('hidden');
-      document.getElementById('dashboardSection').scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-
-    function resetEntryForm() {
-      state.editingEntryId = null;
-      entryForm.reset();
-      entryType.value = 'income';
-      entryDate.value = todayISO();
-      populateCategorySelect(entryType.value, entryCategory, false);
-      saveButton.textContent = 'Salvar registro';
-      cancelEditButton.classList.add('hidden');
-    }
-
-    function deleteEntry(id) {
-      state.entries = state.entries.filter(entry => entry.id !== id);
-      saveEntries();
-      renderAll();
-    }
-
-    function deleteCategory(id) {
-      const inUse = state.entries.some(entry => entry.categoryId === id) || Object.prototype.hasOwnProperty.call(state.budgets, id);
-      if (inUse) {
-        alert('Essa categoria está em uso por registros ou orçamentos e não pode ser excluída.');
-        return;
+    if (removeButton) {
+      const id = removeButton.dataset.id;
+      const source = removeButton.dataset.source;
+      if (source === 'manual') {
+        manualEntries = manualEntries.filter(item => item.id !== id);
+        if (editingId === id) resetEntryForm();
+      } else {
+        skippedOccurrences.push(id);
       }
-      state.categories = state.categories.filter(category => category.id !== id);
-      saveCategories();
-      renderAll();
+      refreshAll();
+    }
+  });
+
+  els.fixedForm.addEventListener('submit', event => {
+    event.preventDefault();
+    const category = getCategoryById(els.fixedCategory.value);
+    if (!category) return;
+
+    fixedItems.push({
+      id: crypto.randomUUID(),
+      type: els.fixedType.value,
+      categoryId: category.id,
+      categoryName: category.name,
+      description: normalizeText(els.fixedDescription.value),
+      amount: Number(els.fixedAmount.value),
+      day: Number(els.fixedDay.value),
+      startMonth: els.fixedStartMonth.value,
+      payment: els.fixedPayment.value,
+      active: els.fixedActive.checked
+    });
+
+    resetFixedForm();
+    refreshAll();
+  });
+
+  els.fixedList.addEventListener('click', event => {
+    const toggleBtn = event.target.closest('[data-fixed-toggle]');
+    const removeBtn = event.target.closest('[data-fixed-remove]');
+
+    if (toggleBtn) {
+      fixedItems = fixedItems.map(item => item.id === toggleBtn.dataset.fixedToggle ? { ...item, active: !item.active } : item);
+      refreshAll();
+      return;
     }
 
-    function removeBudget(categoryId) {
-      delete state.budgets[categoryId];
-      saveBudgets();
-      renderBudgets();
+    if (removeBtn) {
+      const id = removeBtn.dataset.fixedRemove;
+      fixedItems = fixedItems.filter(item => item.id !== id);
+      skippedOccurrences = skippedOccurrences.filter(key => !key.startsWith(`${id}_`));
+      refreshAll();
+    }
+  });
+
+  els.budgetForm.addEventListener('submit', event => {
+    event.preventDefault();
+    budgets[els.budgetCategory.value] = Number(els.budgetAmount.value);
+    els.budgetForm.reset();
+    fillBudgetCategories();
+    refreshAll();
+  });
+
+  els.budgetsList.addEventListener('click', event => {
+    const button = event.target.closest('[data-budget-remove]');
+    if (!button) return;
+    delete budgets[button.dataset.budgetRemove];
+    refreshAll();
+  });
+
+  els.categoryForm.addEventListener('submit', event => {
+    event.preventDefault();
+    const name = normalizeText(els.categoryName.value);
+    const type = els.categoryType.value;
+    const exists = categories.some(item => item.type === type && item.name.toLowerCase() === name.toLowerCase());
+
+    if (exists) {
+      alert('Essa categoria já existe para esse tipo.');
+      return;
     }
 
-    function saveEntries() {
-      localStorage.setItem(STORAGE_KEYS.entries, JSON.stringify(state.entries));
+    categories.push({
+      id: crypto.randomUUID(),
+      name,
+      type,
+      locked: false
+    });
+
+    els.categoryForm.reset();
+    refreshAll();
+  });
+
+  els.categoriesList.addEventListener('click', event => {
+    const button = event.target.closest('[data-category-remove]');
+    if (!button) return;
+
+    const categoryId = button.dataset.categoryRemove;
+    const usedInManual = manualEntries.some(item => item.categoryId === categoryId);
+    const usedInFixed = fixedItems.some(item => item.categoryId === categoryId);
+    const usedInBudget = Boolean(budgets[categoryId]);
+
+    if (usedInManual || usedInFixed || usedInBudget) {
+      alert('Essa categoria está em uso e não pode ser excluída.');
+      return;
     }
 
-    function saveCategories() {
-      localStorage.setItem(STORAGE_KEYS.categories, JSON.stringify(state.categories));
-    }
+    categories = categories.filter(item => item.id !== categoryId);
+    refreshAll();
+  });
 
-    function saveBudgets() {
-      localStorage.setItem(STORAGE_KEYS.budgets, JSON.stringify(state.budgets));
-    }
+  function initialize() {
+    fillTypeSelect(els.entryType);
+    fillTypeSelect(els.fixedType);
+    resetEntryForm();
+    resetFixedForm();
+    checkUserName();
+    refreshAll();
+  }
 
-    function loadFromStorage(key, fallback) {
-      try {
-        const raw = localStorage.getItem(key);
-        return raw ? JSON.parse(raw) : fallback;
-      } catch {
-        return fallback;
-      }
-    }
-
-    function resetChart(key) {
-      if (state.charts[key]) state.charts[key].destroy();
-    }
-
-    function sumByType(entries, type) {
-      return entries.filter(entry => entry.type === type).reduce((sum, entry) => sum + Number(entry.amount || 0), 0);
-    }
-
-    function typeLabel(type) {
-      return type === 'income' ? 'Receita' : type === 'investment' ? 'Investimento' : 'Despesa';
-    }
-
-    function formatCurrency(value) {
-      return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value || 0);
-    }
-
-    function formatDate(value) {
-      return new Intl.DateTimeFormat('pt-BR').format(new Date(value + 'T12:00:00'));
-    }
-
-    function todayISO() {
-      return toISO(new Date());
-    }
-
-    function toISO(date) {
-      const copy = new Date(date);
-      const year = copy.getFullYear();
-      const month = String(copy.getMonth() + 1).padStart(2, '0');
-      const day = String(copy.getDate()).padStart(2, '0');
-      return `${year}-${month}-${day}`;
-    }
-
-    function startOfDay(date) {
-      const d = new Date(date);
-      d.setHours(0,0,0,0);
-      return d;
-    }
-
-    function endOfDay(date) {
-      const d = new Date(date);
-      d.setHours(23,59,59,999);
-      return d;
-    }
-
-    function startOfWeek(date) {
-      const d = startOfDay(date);
-      const day = d.getDay();
-      const diff = day === 0 ? -6 : 1 - day;
-      d.setDate(d.getDate() + diff);
-      return d;
-    }
-
-    function startOfMonth(date) {
-      const d = startOfDay(date);
-      d.setDate(1);
-      return d;
-    }
-
-    function isSameMonth(dateStr, todayStr) {
-      return dateStr.slice(0, 7) === todayStr.slice(0, 7);
-    }
-
-    function capitalize(text) {
-      return text.toLowerCase().replace(/(^|\s)\S/g, l => l.toUpperCase());
-    }
-
-    function escapeHtml(text) {
-      return String(text)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#039;');
-    }
-
-    function uid() {
-      if (window.crypto?.randomUUID) return window.crypto.randomUUID();
-      return 'id-' + Math.random().toString(36).slice(2) + Date.now().toString(36);
-    }
-
-    window.editEntry = editEntry;
-    window.deleteEntry = deleteEntry;
-    window.deleteCategory = deleteCategory;
-    window.removeBudget = removeBudget;
-  </script>
+  initialize();
+})();
+</script>
 </body>
 </html>
