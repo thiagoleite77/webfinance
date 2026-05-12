@@ -80,3 +80,34 @@ project/
 │
 ├── index.html
 └── style.css
+
+
+How to Run
+Download the files
+Keep both files in the same folder
+Open index.html in your browser
+
+No installation or server is required.
+
+Important Notes
+
+Because the application uses LocalStorage:
+
+Data remains saved after refreshing the page
+Data may be lost if browser storage is cleared
+Data is device-specific
+Incognito mode is not recommended
+Future Improvements
+
+Possible future features:
+
+Firebase cloud synchronization
+User authentication
+Open Finance integration
+PDF and Excel exports
+Notifications and reminders
+Multi-user support
+Dark and light themes
+Author
+
+Thiago Leite de Souza
